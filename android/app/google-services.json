@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "418849210323",
+    "project_id": "resqtrack4",
+    "storage_bucket": "resqtrack4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418849210323:android:b76b5b2988058278473926",
+        "android_client_info": {
+          "package_name": "com.packec.resqtrack4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0VfYSKHq7zrAd4guwJ89-HySBLkMIws8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
