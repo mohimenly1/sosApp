@@ -9,7 +9,7 @@
 .buildlog/
 .history
 .svn/
-lib/openai_service.dart
+/lib/openai_service.dart
 .swiftpm/
 migrate_working_dir/
 
