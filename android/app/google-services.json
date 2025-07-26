@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "418849210323",
-    "project_id": "resqtrack4",
-    "storage_bucket": "resqtrack4.firebasestorage.app"
+    "project_number": "1000011916753",
+    "project_id": "sos-management-app",
+    "storage_bucket": "sos-management-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:418849210323:android:b76b5b2988058278473926",
+        "mobilesdk_app_id": "1:1000011916753:android:eb5c4a1135b6ad8f40ecf0",
         "android_client_info": {
-          "package_name": "com.packec.resqtrack4"
+          "package_name": "com.example.fatmaapp"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA0VfYSKHq7zrAd4guwJ89-HySBLkMIws8"
+          "current_key": "AIzaSyAgehcgRA84d5QDMMR6phH-4AGeEfIVH5M"
         }
       ],
       "services": {
