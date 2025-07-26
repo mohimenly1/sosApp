@@ -9,7 +9,6 @@
 .buildlog/
 .history
 .svn/
-/openai_service.dart
 .swiftpm/
 migrate_working_dir/
 
@@ -44,3 +43,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/lib/openai_service.dart
