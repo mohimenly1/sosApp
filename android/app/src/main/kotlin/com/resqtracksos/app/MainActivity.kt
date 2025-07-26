@@ -1,4 +1,4 @@
-package com.example.fatmaapp
+package com.resqtracksos.app
 
 import io.flutter.embedding.android.FlutterActivity
 

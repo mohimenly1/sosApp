@@ -23,6 +23,34 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000011916753:android:ccbc70e8e16a9b0940ecf0",
+        "android_client_info": {
+          "package_name": "com.resqtracksos.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1000011916753-r3u4s26dso2jdcv2c3e7veq5ss6m3l42.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.resqtracksos.app",
+            "certificate_hash": "2a52b307aacb6de98673eb62283411f226f3b121"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgehcgRA84d5QDMMR6phH-4AGeEfIVH5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"

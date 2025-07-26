@@ -16,7 +16,18 @@ dependencies:
   permission_handler: ^12.0.1
   firebase_core: ^3.15.2
   firebase_messaging: ^15.2.10
+  firebase_auth: ^5.1.2
+  cloud_firestore: ^5.0.3
+  firebase_storage: ^12.1.1
   speech_to_text: ^7.2.0  # Fixes Kotlin Registrar error
+    # --- قاعدة البيانات المحلية للعمل بدون انترنت (Offline) ---
+  sqflite: ^2.3.3+1             # قاعدة بيانات SQLite المحلية
+  path_provider: ^2.1.3         # للمساعدة في العثور على مسار حفظ قاعدة البيانات
+  flutter_map: ^7.0.1 # بديل مجاني لخرائط جوجل
+  latlong2: ^0.9.1    # حزمة مساعدة للتعامل مع إحداثيات الخرائط
+  firebase_app_check: ^0.3.0
+  change_app_package_name: ^1.5.0
+
 
 dev_dependencies:
   flutter_test:
