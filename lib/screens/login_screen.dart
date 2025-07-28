@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,21 +23,86 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Main function to handle the sign-in process
   void _signIn() async {
-    // Validate form first
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+    // 1. Validate the form
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      // Simulate authentication delay
-      await Future.delayed(const Duration(seconds: 2));
+    setState(() => _isLoading = true);
 
-      // For now, we'll just navigate to permissions screen
-      // In a real app, you would use Firebase Auth here
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/permissions');
+    try {
+      // 2. Sign in the user with Firebase Auth
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final user = userCredential.user;
+      if (user != null) {
+        // 3. Fetch user data from Firestore to get their role
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (docSnapshot.exists) {
+          final userType = docSnapshot.data()?['userType'];
+          // 4. Navigate based on the user's role
+          if (mounted) {
+            _navigateUser(userType);
+          }
+        } else {
+          // Handle case where user exists in Auth but not in Firestore
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('User data not found. Please contact support.'),
+                backgroundColor: Colors.orange),
+          );
+        }
       }
+    } on FirebaseAuthException catch (e) {
+      // 5. Handle specific Firebase authentication errors
+      String message = 'An error occurred. Please check your credentials.';
+      if (e.code == 'user-not-found' ||
+          e.code == 'wrong-password' ||
+          e.code == 'invalid-credential') {
+        message = 'Incorrect email or password.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      // Handle other generic errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('An unexpected error occurred: $e'),
+            backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
-      setState(() => _isLoading = false);
+  // Helper function to handle navigation based on user role
+  void _navigateUser(String? userType) {
+    switch (userType) {
+      case 'individual':
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 'rescue_team':
+        Navigator.pushReplacementNamed(context, '/rescue_home');
+        break;
+      case 'government_entity':
+        Navigator.pushReplacementNamed(context, '/gov_home');
+        break;
+      default:
+        // Fallback to the generic home screen if type is null or unknown
+        Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
@@ -54,9 +121,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Center(
                     child: Image.asset(
-                      'lib/assets/Untitled.gif',
-                      height: 120,
-                      width: 120,
+                      'lib/assets/logo.jpeg',
+                      height: 150,
+                      width: 150,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -74,19 +141,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email or phone number',
+                      labelText: 'Email', // Changed for clarity
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF0A2342), width: 2),
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email or phone number';
+                        return 'Please enter your email';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Please enter a valid email';
                       }
                       return null;
                     },
@@ -110,29 +175,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF0A2342), width: 2),
-                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment:
+                        MainAxisAlignment.end, // Aligned to the right
                     children: [
-                      const SizedBox(),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // TODO: Implement forgot password functionality
+                        },
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(color: Color(0xFF0A2342)),
@@ -141,25 +200,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Dont have an account?'),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/signup');
-                        },
-                        child: const Text(
-                          'Sign up now',
-                          style: TextStyle(
-                            color: Color(0xFF0A2342),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signIn,
                     style: ElevatedButton.styleFrom(
@@ -187,6 +227,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Don't have an account?"),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/signup');
+                        },
+                        child: const Text(
+                          'Sign up now',
+                          style: TextStyle(
+                            color: Color(0xFF0A2342),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

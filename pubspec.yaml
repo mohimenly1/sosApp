@@ -27,6 +27,8 @@ dependencies:
   latlong2: ^0.9.1    # حزمة مساعدة للتعامل مع إحداثيات الخرائط
   firebase_app_check: ^0.3.0
   change_app_package_name: ^1.5.0
+  geolocator: ^12.0.0
+  image_picker: ^1.1.2
 
 
 dev_dependencies:
@@ -38,3 +40,4 @@ flutter:
   uses-material-design: true
   assets:
     - lib/assets/Untitled.gif
+    - lib/assets/logo.jpeg

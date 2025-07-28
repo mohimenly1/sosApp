@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart'; // 1. Import App Check
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:resq_track4/screens/sos_screen.dart';
 import 'firebase_options.dart';
 
 import 'screens/splash_screen.dart';
@@ -8,19 +9,42 @@ import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
+import 'widgets/main_scaffold.dart'; // Import the new scaffold
+
+// Placeholder screens for the other roles
+class RescueHomeScreen extends StatelessWidget {
+  const RescueHomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MainScaffold(
+      body: Scaffold(
+        appBar: AppBar(title: Text('Rescue Team Dashboard')),
+        body: const Center(child: Text('Welcome, Rescue Team!')),
+      ),
+    );
+  }
+}
+
+class GovHomeScreen extends StatelessWidget {
+  const GovHomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MainScaffold(
+      body: Scaffold(
+        appBar: AppBar(title: Text('Government Dashboard')),
+        body: const Center(child: Text('Welcome, Government Entity!')),
+      ),
+    );
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // 2. Initialize App Check right after Firebase
   await FirebaseAppCheck.instance.activate(
-    // You can also use a web recaptcha v3 provider
-    // webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    // The default provider for Android is Play Integrity or Safety Net.
     androidProvider: AndroidProvider.debug,
-    // The default provider for iOS is Device Check or App Attest.
     appleProvider: AppleProvider.debug,
   );
   runApp(const MyApp());
@@ -35,12 +59,16 @@ class MyApp extends StatelessWidget {
       title: 'ResQTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue, // A more standard primary color
+        primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0A2342)),
         appBarTheme: const AppBarTheme(
           elevation: 0,
           centerTitle: true,
+          backgroundColor: Color(0xFF0A2342),
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -57,7 +85,7 @@ class MyApp extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(
-              color: Color(0xFF0A2342), // Consistent focus color
+              color: Color(0xFF0A2342),
               width: 2.0,
             ),
           ),
@@ -68,8 +96,12 @@ class MyApp extends StatelessWidget {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const HomeScreen(),
+        // UPDATED: Wrap HomeScreen with the new MainScaffold
+        '/home': (context) => const MainScaffold(body: HomeScreen()),
         '/chat': (context) => const ChatScreen(),
+        '/rescue_home': (context) => const RescueHomeScreen(),
+        '/gov_home': (context) => const GovHomeScreen(),
+        '/sos': (context) => const SosScreen(),
       },
     );
   }

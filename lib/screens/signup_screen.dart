@@ -11,9 +11,8 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  // Controllers for each text field
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  // Controllers updated to match the new schema
+  final _nameController = TextEditingController(); // Combined name
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -26,9 +25,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
-    // Dispose all controllers to free up resources
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    // Dispose all controllers
+    _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -36,12 +34,9 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  // The main function to handle the sign-up process
   void _signUp() async {
-    // 1. Validate the form and user type selection
     if (!_formKey.currentState!.validate() || _selectedUserType == null) {
       if (_selectedUserType == null) {
-        // Show an error if user type is not selected
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a user type.'),
@@ -55,7 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 2. Create user with email and password using Firebase Auth
+      // 1. Create user in Firebase Auth (handles email/password securely)
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -65,48 +60,71 @@ class _SignupScreenState extends State<SignupScreen> {
       User? newUser = userCredential.user;
 
       if (newUser != null) {
-        // 3. Store additional user data in Firestore
+        // 2. Prepare user data for Firestore according to the new schema
+        final userData = {
+          'uid': newUser.uid, // The Primary Key
+          'name': _nameController.text.trim(), // Full name
+          'phone': _phoneController.text.trim(),
+          'email': _emailController.text.trim(),
+          // DO NOT SAVE THE PASSWORD HERE
+          'userType': _selectedUserType,
+          'location': null, // Placeholder for location, can be updated later
+          'medicalFileId': null, // Optional field, null by default
+          'createdAt': Timestamp.now(),
+        };
+
+        // 3. Store the user data in 'users' collection in Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(newUser.uid)
-            .set({
-          'firstName': _firstNameController.text.trim(),
-          'lastName': _lastNameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'phone': _phoneController.text.trim(),
-          'userType': _selectedUserType,
-          'createdAt': Timestamp.now(),
-          'uid': newUser.uid,
-        });
+            .set(userData);
 
-        // 4. Navigate to home screen on success
+        // 4. *** IMPORTANT: Navigate based on user role ***
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          _navigateUser(_selectedUserType!);
         }
       }
     } on FirebaseAuthException catch (e) {
-      // 5. Handle specific Firebase errors
       String message = 'An error occurred. Please try again.';
       if (e.code == 'weak-password') {
         message = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
         message = 'The account already exists for that email.';
+      } else {
+        message = e.message ?? 'An unknown error occurred.';
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     } catch (e) {
-      // Handle other generic errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('An unexpected error occurred: $e'),
             backgroundColor: Colors.red),
       );
     } finally {
-      // Ensure loading indicator is turned off
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  // Helper function to handle navigation
+  void _navigateUser(String userType) {
+    switch (userType) {
+      case 'individual':
+        Navigator.pushReplacementNamed(context, '/home'); // For regular users
+        break;
+      case 'rescue_team':
+        Navigator.pushReplacementNamed(
+            context, '/rescue_home'); // For rescue teams
+        break;
+      case 'government_entity':
+        Navigator.pushReplacementNamed(context, '/gov_home'); // For government
+        break;
+      default:
+        // Fallback to the generic home screen
+        Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
@@ -123,47 +141,30 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // ... (Image and Title are the same)
                   const SizedBox(height: 32),
                   Center(
-                    child: Image.asset(
-                      'lib/assets/Untitled.gif',
-                      height: 100,
-                      width: 100,
-                    ),
+                    child: Image.asset('lib/assets/Untitled.gif', height: 100),
                   ),
                   const SizedBox(height: 32),
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0A2342),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  const Text('Create Account',
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0A2342)),
+                      textAlign: TextAlign.center),
                   const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _firstNameController,
-                          decoration: InputDecoration(labelText: 'First Name'),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Enter first name' : null,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _lastNameController,
-                          decoration: InputDecoration(labelText: 'Last Name'),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Enter last name' : null,
-                        ),
-                      ),
-                    ],
+
+                  // UPDATED: Single field for full name
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(labelText: 'Full Name'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter your full name' : null,
                   ),
                   const SizedBox(height: 16),
+
+                  // ... (Email and Phone fields are the same)
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(labelText: 'Email'),
@@ -183,6 +184,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         value!.isEmpty ? 'Enter phone number' : null,
                   ),
                   const SizedBox(height: 16),
+
+                  // ... (Password fields are the same)
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _isObscure,
@@ -224,6 +227,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
+
+                  // UPDATED: Added the third user type
                   DropdownButtonFormField<String>(
                     value: _selectedUserType,
                     decoration: InputDecoration(labelText: 'User Type'),
@@ -232,6 +237,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           value: 'individual', child: Text('Individual')),
                       DropdownMenuItem(
                           value: 'rescue_team', child: Text('Rescue Team')),
+                      DropdownMenuItem(
+                          value: 'government_entity',
+                          child: Text('Government Entity')),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -242,6 +250,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         value == null ? 'Please select a user type' : null,
                   ),
                   const SizedBox(height: 32),
+
+                  // ... (Button and Sign In link are the same)
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signUp,
                     style: ElevatedButton.styleFrom(
@@ -255,19 +265,14 @@ class _SignupScreenState extends State<SignupScreen> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Sign up',
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white)))
+                        : const Text('Sign up',
                             style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -277,13 +282,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextButton(
                         onPressed: () =>
                             Navigator.pushReplacementNamed(context, '/login'),
-                        child: const Text(
-                          'Sign in',
-                          style: TextStyle(
-                            color: Color(0xFF0A2342),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: const Text('Sign in',
+                            style: TextStyle(
+                                color: Color(0xFF0A2342),
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -293,7 +295,6 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
       ),
-      // I removed the bottom navigation bar as it might not be conventional on a sign-up screen
     );
   }
 }
