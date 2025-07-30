@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:resq_track4/screens/medical_file_screen.dart';
+import 'package:resq_track4/screens/rescue_team/add_team_screen.dart';
+import 'package:resq_track4/screens/rescue_team/manage_teams_screen.dart';
+import 'package:resq_track4/screens/settings_screen.dart';
 import 'package:resq_track4/screens/sos_screen.dart';
 import 'firebase_options.dart';
 
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/rescue_home_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
 import 'widgets/main_scaffold.dart'; // Import the new scaffold
 
 // Placeholder screens for the other roles
-class RescueHomeScreen extends StatelessWidget {
-  const RescueHomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MainScaffold(
-      body: Scaffold(
-        appBar: AppBar(title: Text('Rescue Team Dashboard')),
-        body: const Center(child: Text('Welcome, Rescue Team!')),
-      ),
-    );
-  }
-}
 
 class GovHomeScreen extends StatelessWidget {
   const GovHomeScreen({super.key});
@@ -102,6 +95,10 @@ class MyApp extends StatelessWidget {
         '/rescue_home': (context) => const RescueHomeScreen(),
         '/gov_home': (context) => const GovHomeScreen(),
         '/sos': (context) => const SosScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/medical_file': (context) => const MedicalFileScreen(),
+        '/manage_teams': (context) => const ManageTeamsScreen(),
+        '/add_team': (context) => const AddTeamScreen(),
       },
     );
   }

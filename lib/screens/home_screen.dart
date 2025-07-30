@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/home_grid_button.dart'; // سنقوم بإنشاء هذا الملف
+import '../widgets/home_grid_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,17 +12,16 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A2342),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () {
-            // Handle back navigation
-          },
-        ),
+        // We can remove the back button from the main home screen
+        leading: const SizedBox.shrink(),
+        centerTitle: false,
+        title: const Text("Dashboard"),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
             onPressed: () {
-              // Handle settings navigation
+              // UPDATED: Navigate to the new settings screen
+              Navigator.pushNamed(context, '/settings');
             },
           ),
         ],
@@ -75,7 +74,7 @@ class HomeScreen extends StatelessWidget {
                     },
                   ),
                   HomeGridButton(
-                    icon: Icons.night_shelter_outlined,
+                    icon: Icons.night_shelter_outlined, // Corrected icon
                     label: 'Shelter',
                     onTap: () {},
                   ),
