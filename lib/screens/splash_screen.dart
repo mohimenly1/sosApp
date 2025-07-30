@@ -12,28 +12,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // نعطي الشاشة ثانيتين للعرض ثم نبدأ بطلب الأذونات
+
     Future.delayed(const Duration(seconds: 2), () {
       _requestPermissionsAndNavigate();
     });
   }
 
-  // هذه الدالة تطلب كل الأذونات المطلوبة مباشرة من النظام
   Future<void> _requestPermissionsAndNavigate() async {
-    // قائمة الأذونات التي يحتاجها تطبيقك
     final List<Permission> permissionsToRequest = [
       Permission.location,
-      Permission.notification, // إذن الإشعارات
+      Permission.notification,
       Permission.camera,
       Permission.microphone,
     ];
 
-    // طلب كل إذن في القائمة واحدًا تلو الآخر
     await permissionsToRequest.request();
 
-    // التأكد من أن الواجهة ما زالت موجودة قبل الانتقال
     if (mounted) {
-      // بعد الانتهاء من جميع الأذونات، انتقل إلى شاشة تسجيل الدخول
       Navigator.pushReplacementNamed(context, '/login');
     }
   }
@@ -62,7 +57,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // يمكن إضافة مؤشر تحميل هنا ليعلم المستخدم أن شيئًا ما يحدث
             const CircularProgressIndicator(
               color: Color(0xFF0A2342),
             ),

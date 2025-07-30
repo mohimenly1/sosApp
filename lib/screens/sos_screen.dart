@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/sos_confirmation_card.dart'; // سنقوم بإنشاء هذا الملف
+import '../widgets/sos_confirmation_card.dart';
 
 class SosScreen extends StatelessWidget {
   const SosScreen({super.key});
@@ -20,9 +20,7 @@ class SosScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
-            onPressed: () {
-              // Handle settings navigation
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -32,7 +30,6 @@ class SosScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // The big red SOS button
             Container(
               width: 150,
               height: 150,
@@ -59,7 +56,6 @@ class SosScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
-            // The confirmation and report form card
             const SosConfirmationCard(),
           ],
         ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart';
 
 class AllAlertsScreen extends StatelessWidget {
   const AllAlertsScreen({super.key});
 
-  // Helper function to get an icon based on the disaster type
   IconData _getDisasterIcon(String disasterType) {
     switch (disasterType.toLowerCase()) {
       case 'fire':

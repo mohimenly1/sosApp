@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart'; // 1. Import Firebase Messaging
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,10 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final user = userCredential.user;
       if (user != null) {
-        // 2. Get the latest FCM token
         final fcmToken = await FirebaseMessaging.instance.getToken();
 
-        // 3. Update the token in Firestore
         if (fcmToken != null) {
           await FirebaseFirestore.instance
               .collection('users')
@@ -51,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
               .update({'fcmToken': fcmToken});
         }
 
-        // 4. Fetch user data and navigate
         final docSnapshot = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -111,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ... The rest of your build method remains exactly the same
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(

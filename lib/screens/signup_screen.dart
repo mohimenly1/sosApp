@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart'; // 1. Import Firebase Messaging
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -58,10 +58,8 @@ class _SignupScreenState extends State<SignupScreen> {
       User? newUser = userCredential.user;
 
       if (newUser != null) {
-        // 2. Get the FCM token for the device
         final fcmToken = await FirebaseMessaging.instance.getToken();
 
-        // 3. Prepare user data, now including the FCM token
         final userData = {
           'uid': newUser.uid,
           'name': _nameController.text.trim(),
@@ -126,7 +124,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ... The rest of your build method remains exactly the same
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(

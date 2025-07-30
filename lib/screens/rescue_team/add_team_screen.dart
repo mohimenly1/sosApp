@@ -20,8 +20,7 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
   LatLng? _startPoint;
   LatLng? _endPoint;
 
-  // NEW: State variables for the new fields
-  double _safetyLevel = 3.0; // Default safety level (1 to 5)
+  double _safetyLevel = 3.0;
   bool _isOfflineAvailable = false;
 
   Future<void> _saveTeamAndRoute() async {
@@ -42,7 +41,6 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
     }
 
     try {
-      // 1. Create the evacuation route document first, now with the new data
       final routeDoc =
           await FirebaseFirestore.instance.collection('evacuation_routes').add({
         'startPoint': GeoPoint(_startPoint!.latitude, _startPoint!.longitude),
@@ -54,7 +52,6 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
         'lastModifiedAt': Timestamp.now(),
       });
 
-      // 2. Create the rescue team document and link it to the route
       await FirebaseFirestore.instance.collection('rescue_teams').add({
         'name': _teamNameController.text.trim(),
         'membersCount': int.tryParse(_membersCountController.text.trim()) ?? 0,
@@ -166,7 +163,6 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              // NEW: UI for Safety Level
               Text('Route Safety Level: ${_safetyLevel.toInt()}',
                   style: const TextStyle(fontWeight: FontWeight.w500)),
               Slider(
@@ -182,7 +178,6 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              // NEW: UI for Offline Availability
               SwitchListTile(
                 title: const Text('Make route available offline?',
                     style: TextStyle(fontWeight: FontWeight.w500)),

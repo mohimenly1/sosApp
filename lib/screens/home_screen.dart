@@ -30,10 +30,8 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              _buildInfoCard("Today's News"), // This can be developed later
+              _buildInfoCard("Today's News"),
               const SizedBox(height: 20),
-
-              // UPDATED: StreamBuilder to show the latest alert
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('alerts')
@@ -58,11 +56,9 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
-                  // UPDATED: Navigate to the all alerts screen
                   Navigator.pushNamed(context, '/all_alerts');
                 },
                 child: const Row(
@@ -95,7 +91,7 @@ class HomeScreen extends StatelessWidget {
                   HomeGridButton(
                     icon: Icons.night_shelter_outlined,
                     label: 'Shelter',
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(context, '/safe_route'),
                   ),
                   HomeGridButton(
                     icon: Icons.cloud_outlined,
@@ -116,7 +112,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for static info cards like "Today's News"
   Widget _buildInfoCard(String title) {
     return Container(
       padding: const EdgeInsets.all(16),

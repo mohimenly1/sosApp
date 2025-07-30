@@ -7,12 +7,11 @@ class RescueHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The main scaffold provides the consistent bottom navigation bar
     return MainScaffold(
       body: Scaffold(
         appBar: AppBar(
           title: const Text('Rescue Dashboard'),
-          automaticallyImplyLeading: false, // Removes the back button
+          automaticallyImplyLeading: false,
         ),
         body: GridView.count(
           padding: const EdgeInsets.all(16.0),
@@ -25,7 +24,6 @@ class RescueHomeScreen extends StatelessWidget {
               icon: Icons.group_add_outlined,
               label: 'Manage Teams',
               onTap: () {
-                // Navigate to the screen that lists all created teams
                 Navigator.pushNamed(context, '/manage_teams');
               },
             ),
@@ -39,9 +37,7 @@ class RescueHomeScreen extends StatelessWidget {
             HomeGridButton(
               icon: Icons.map_outlined,
               label: 'Live Map',
-              onTap: () {
-                // TODO: Navigate to the main map screen
-              },
+              onTap: () {},
             ),
             HomeGridButton(
               icon: Icons.settings_outlined,

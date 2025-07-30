@@ -5,10 +5,9 @@ import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
 import 'package:resq_track4/screens/all_alerts_screen.dart';
 import 'package:resq_track4/screens/rescue_home_screen.dart';
 import 'package:resq_track4/screens/rescue_team/active_reports_screen.dart';
+import 'package:resq_track4/screens/safe_routes_screen.dart';
 import 'firebase_options.dart';
-import 'services/notification_service.dart'; // Import our new service
-
-// ... (Your other screen imports and placeholder widgets)
+import 'services/notification_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -36,7 +35,6 @@ class GovHomeScreen extends StatelessWidget {
   }
 }
 
-// Function to handle messages when the app is in the background or terminated
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -49,10 +47,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Set the background messaging handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Initialize our notification service
   await NotificationService().initNotifications();
 
   await FirebaseAppCheck.instance.activate(
@@ -71,7 +67,6 @@ class MyApp extends StatelessWidget {
       title: 'ResQTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // ... (Your theme data remains the same)
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0A2342)),
@@ -89,7 +84,6 @@ class MyApp extends StatelessWidget {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        // UPDATED: Wrap HomeScreen with the new MainScaffold
         '/home': (context) => const MainScaffold(body: HomeScreen()),
         '/chat': (context) => const ChatScreen(),
         '/rescue_home': (context) => const RescueHomeScreen(),
@@ -102,6 +96,7 @@ class MyApp extends StatelessWidget {
         '/send_alert': (context) => const SendAlertScreen(),
         '/all_alerts': (context) => const AllAlertsScreen(),
         '/active_reports': (context) => const ActiveReportsScreen(),
+        '/safe_route': (context) => const SafeRoutesScreen(),
       },
     );
   }

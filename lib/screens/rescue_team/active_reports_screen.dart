@@ -37,7 +37,7 @@ class ActiveReportsScreen extends StatelessWidget {
             itemCount: reports.length,
             itemBuilder: (context, index) {
               final report = reports[index];
-              // Safety check to ensure data is in the expected format
+
               final dataObject = report.data();
               if (dataObject is! Map<String, dynamic>) {
                 return const Card(
@@ -54,8 +54,7 @@ class ActiveReportsScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: const Icon(Icons.sos, color: Colors.red, size: 40),
-                  title: UserInfoWidget(
-                      userId: data['userId'] ?? ''), // Pass userId safely
+                  title: UserInfoWidget(userId: data['userId'] ?? ''),
                   subtitle: Text(
                     '${data['content'] ?? 'No description.'}\nReported at: $formattedDate',
                     maxLines: 2,
@@ -81,7 +80,6 @@ class ActiveReportsScreen extends StatelessWidget {
   }
 }
 
-// Helper widget with the fix for the null error
 class UserInfoWidget extends StatelessWidget {
   final String userId;
   const UserInfoWidget({super.key, required this.userId});
@@ -97,13 +95,11 @@ class UserInfoWidget extends StatelessWidget {
       future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          // THE FIX: Check if the document actually exists before trying to read its data
           if (snapshot.hasData && snapshot.data!.exists) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
             return Text(userData['name'] ?? 'Unknown User',
                 style: const TextStyle(fontWeight: FontWeight.bold));
           } else {
-            // This handles the case where the user who made the report was deleted
             return const Text('Deleted User',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -111,7 +107,7 @@ class UserInfoWidget extends StatelessWidget {
                     fontStyle: FontStyle.italic));
           }
         }
-        // While data is loading
+
         return const Text('Loading user...',
             style: TextStyle(fontStyle: FontStyle.italic));
       },

@@ -6,11 +6,9 @@ import 'team_details_screen.dart'; // Import the new details screen
 class ManageTeamsScreen extends StatelessWidget {
   const ManageTeamsScreen({super.key});
 
-  // Function to handle team and route deletion
   Future<void> _deleteTeam(
       BuildContext context, String teamId, String routeId) async {
     try {
-      // Using a batch write to delete both documents atomically
       final batch = FirebaseFirestore.instance.batch();
 
       final teamRef =
@@ -81,7 +79,6 @@ class ManageTeamsScreen extends StatelessWidget {
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value == 'delete') {
-                        // Show a confirmation dialog before deleting
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
@@ -104,9 +101,7 @@ class ManageTeamsScreen extends StatelessWidget {
                             ],
                           ),
                         );
-                      } else if (value == 'edit') {
-                        // TODO: Navigate to an edit screen
-                      }
+                      } else if (value == 'edit') {}
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
@@ -122,7 +117,6 @@ class ManageTeamsScreen extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    // Navigate to team details screen, passing the team ID
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -15,8 +15,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final OpenAIService _openAIService = OpenAIService();
   bool _isLoading = false;
 
-  String? _chatId; // To hold the ID of the current chat session
-  Stream<QuerySnapshot>? _messagesStream; // To listen for new messages
+  String? _chatId;
+  Stream<QuerySnapshot>? _messagesStream;
 
   @override
   void initState() {
@@ -24,12 +24,10 @@ class _ChatScreenState extends State<ChatScreen> {
     _initChat();
   }
 
-  // Initialize the chat: find an existing chat or prepare to create a new one
   void _initChat() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    // Look for an existing chat with the AI for the current user
     final querySnapshot = await FirebaseFirestore.instance
         .collection('chats')
         .where('userId', isEqualTo: user.uid)
@@ -38,7 +36,6 @@ class _ChatScreenState extends State<ChatScreen> {
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      // Chat exists, load its ID and messages
       setState(() {
         _chatId = querySnapshot.docs.first.id;
         _messagesStream = FirebaseFirestore.instance
@@ -49,8 +46,6 @@ class _ChatScreenState extends State<ChatScreen> {
             .snapshots();
       });
     }
-    // If no chat exists, _chatId will remain null.
-    // A new chat will be created when the first message is sent.
   }
 
   Future<void> _sendMessage() async {
@@ -62,7 +57,6 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // If this is the first message, create the chat document first
       if (_chatId == null) {
         final newChatDoc =
             await FirebaseFirestore.instance.collection('chats').add({
@@ -82,9 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
 
-      // 1. Save user's message to Firestore
       final userMessage = {
-        'senderType': 'individual', // Or fetch user role from their profile
+        'senderType': 'individual',
         'content': userMessageContent,
         'timestamp': Timestamp.now(),
       };
@@ -94,7 +87,6 @@ class _ChatScreenState extends State<ChatScreen> {
           .collection('messages')
           .add(userMessage);
 
-      // Fetch message history for OpenAI
       final messagesHistorySnapshot = await FirebaseFirestore.instance
           .collection('chats')
           .doc(_chatId)
@@ -108,10 +100,8 @@ class _ChatScreenState extends State<ChatScreen> {
         };
       }).toList();
 
-      // 2. Get AI's reply
       final aiReplyContent = await _openAIService.sendMessage(historyForAI);
 
-      // 3. Save AI's message to Firestore
       final aiMessage = {
         'senderType': 'ai',
         'content': aiReplyContent,
@@ -123,13 +113,11 @@ class _ChatScreenState extends State<ChatScreen> {
           .collection('messages')
           .add(aiMessage);
 
-      // 4. Update the last message in the parent chat document
       await FirebaseFirestore.instance.collection('chats').doc(_chatId).update({
         'lastMessage': aiReplyContent,
         'lastMessageTime': Timestamp.now(),
       });
     } catch (e) {
-      // Handle error by saving an error message to the chat
       final errorMessage = {
         'senderType': 'ai',
         'content': "Sorry, I couldn't process your request. Error: $e",
@@ -163,7 +151,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Messages list now uses a StreamBuilder
           Expanded(
             child: _messagesStream == null
                 ? _buildEmptyState()
@@ -202,8 +189,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   ),
           ),
-
-          // Input area
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
@@ -281,7 +266,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-// Chat bubble widget (No changes needed here)
 class ChatMessage extends StatelessWidget {
   final String text;
   final bool isUser;

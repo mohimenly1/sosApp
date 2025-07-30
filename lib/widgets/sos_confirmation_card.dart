@@ -55,7 +55,7 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
       setState(() {
         _currentPosition = position;
         _locationMessage = 'Location captured. Tap map to adjust.';
-        // Move map to the new location
+
         _mapController.move(
             LatLng(position.latitude, position.longitude), 15.0);
       });
@@ -65,7 +65,6 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    // ... (Image picking logic remains the same)
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source);
 
@@ -79,7 +78,6 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
   }
 
   Future<void> _sendReport() async {
-    // ... (Sending report logic remains the same)
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     if (_currentPosition == null) {

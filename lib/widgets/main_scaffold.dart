@@ -34,7 +34,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           });
         }
       } catch (e) {
-        // Handle potential errors, e.g., user document not found
         print("Could not fetch user role: $e");
       }
     }
@@ -44,11 +43,9 @@ class _MainScaffoldState extends State<MainScaffold> {
     setState(() {
       _selectedIndex = index;
     });
-    // TODO: Add navigation logic here based on index
   }
 
   void _onFabTapped() {
-    // Differentiated action based on user role
     if (_userRole == 'rescue_team') {
       Navigator.pushNamed(context, '/send_alert');
     } else {

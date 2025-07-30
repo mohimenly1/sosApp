@@ -42,7 +42,6 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
     }
 
     try {
-      // 1. Fetch the user document to get the medicalFileId
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -52,7 +51,6 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
         final medicalId = userDoc.data()!['medicalFileId'];
         setState(() => _medicalFileId = medicalId);
 
-        // 2. Fetch the medical file document using the ID
         final medicalDoc = await FirebaseFirestore.instance
             .collection('medical_files')
             .doc(medicalId)
@@ -91,13 +89,11 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
       'allergies': _allergiesController.text.trim(),
       'emergencyContact': _emergencyContactController.text.trim(),
       'lastUpdated': Timestamp.now(),
-      'ownerId':
-          user.uid, // Good practice to keep a reference back to the owner
+      'ownerId': user.uid,
     };
 
     try {
       if (_medicalFileId == null) {
-        // Create new medical file and link it to the user
         final newMedicalDoc = await FirebaseFirestore.instance
             .collection('medical_files')
             .add(medicalData);
@@ -108,7 +104,6 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
           'medicalFileId': newMedicalDoc.id,
         });
       } else {
-        // Update existing medical file
         await FirebaseFirestore.instance
             .collection('medical_files')
             .doc(_medicalFileId)

@@ -4,15 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  // Function to handle the sign-out process
   Future<void> _signOut(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // After signing out, navigate to the login screen and remove all previous routes
+
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     } catch (e) {
-      // Show an error message if sign-out fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to sign out: $e')),
       );
@@ -43,7 +41,7 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingsTile(
               icon: Icons.person_outline,
               title: "Profile",
-              onTap: () {/* TODO: Navigate to Profile Screen */},
+              onTap: () {},
             ),
             _buildSettingsTile(
               icon: Icons.medical_services_outlined,
@@ -59,10 +57,8 @@ class SettingsScreen extends StatelessWidget {
             SwitchListTile(
               title: const Text("العربية",
                   style: TextStyle(fontWeight: FontWeight.w500)),
-              value: false, // TODO: Link this to a state management solution
-              onChanged: (bool value) {
-                /* TODO: Implement language change logic */
-              },
+              value: false,
+              onChanged: (bool value) {},
               secondary:
                   const Icon(Icons.language_outlined, color: primaryColor),
               activeColor: primaryColor,
@@ -70,7 +66,7 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingsTile(
               icon: Icons.privacy_tip_outlined,
               title: "Privacy Policy",
-              onTap: () {/* TODO: Show Privacy Policy */},
+              onTap: () {},
             ),
           ]),
           const SizedBox(height: 20),
@@ -91,7 +87,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for section titles
   Widget _buildSettingsSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -106,7 +101,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget to create the card container for settings items
   Widget _buildSettingsCard(List<Widget> children) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -120,7 +114,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for a standard settings list tile
   Widget _buildSettingsTile(
       {required IconData icon,
       required String title,
