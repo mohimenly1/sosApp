@@ -4,6 +4,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
 import 'package:resq_track4/screens/all_alerts_screen.dart';
 import 'package:resq_track4/screens/rescue_home_screen.dart';
+import 'package:resq_track4/screens/rescue_team/active_reports_screen.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart'; // Import our new service
 
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget {
         '/add_team': (context) => const AddTeamScreen(),
         '/send_alert': (context) => const SendAlertScreen(),
         '/all_alerts': (context) => const AllAlertsScreen(),
+        '/active_reports': (context) => const ActiveReportsScreen(),
       },
     );
   }

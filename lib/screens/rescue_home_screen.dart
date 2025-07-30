@@ -33,7 +33,7 @@ class RescueHomeScreen extends StatelessWidget {
               icon: Icons.warning_amber_rounded,
               label: 'Active Alerts',
               onTap: () {
-                // TODO: Navigate to active alerts screen
+                Navigator.pushNamed(context, '/active_reports');
               },
             ),
             HomeGridButton(
