@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/home_grid_button.dart';
+import '../widgets/alert_card_widget.dart'; // Import the new widget
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This is the main screen layout
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A2342),
         elevation: 0,
-        // We can remove the back button from the main home screen
         leading: const SizedBox.shrink(),
         centerTitle: false,
         title: const Text("Dashboard"),
@@ -20,7 +20,6 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
             onPressed: () {
-              // UPDATED: Navigate to the new settings screen
               Navigator.pushNamed(context, '/settings');
             },
           ),
@@ -31,50 +30,70 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              _buildInfoCard("Today's News"),
+              _buildInfoCard("Today's News"), // This can be developed later
               const SizedBox(height: 20),
-              _buildInfoCard("Current alert"),
+
+              // UPDATED: StreamBuilder to show the latest alert
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('alerts')
+                    .orderBy('timestamp', descending: true)
+                    .limit(1)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return _buildInfoCard("No Current Alerts");
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final latestAlert =
+                      snapshot.data!.docs.first.data() as Map<String, dynamic>;
+
+                  return AlertCardWidget(
+                    title: latestAlert['title'] ?? 'No Title',
+                    description: latestAlert['description'] ?? 'No Description',
+                    disasterType: latestAlert['disasterType'] ?? 'Other',
+                  );
+                },
+              ),
+
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // UPDATED: Navigate to the all alerts screen
+                  Navigator.pushNamed(context, '/all_alerts');
+                },
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'See More',
-                      style: TextStyle(
-                        color: Color(0xFF555555),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('See More',
+                        style: TextStyle(
+                            color: Color(0xFF555555),
+                            fontWeight: FontWeight.bold)),
                     SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: Color(0xFF555555),
-                    ),
+                    Icon(Icons.arrow_forward_ios,
+                        size: 14, color: Color(0xFF555555)),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-              // Grid for the main action buttons
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 1.2, // Adjust aspect ratio as needed
+                childAspectRatio: 1.2,
                 children: [
                   HomeGridButton(
                     icon: Icons.smart_toy_outlined,
                     label: 'chatbot',
-                    onTap: () {
-                      Navigator.pushNamed(context, '/chat');
-                    },
+                    onTap: () => Navigator.pushNamed(context, '/chat'),
                   ),
                   HomeGridButton(
-                    icon: Icons.night_shelter_outlined, // Corrected icon
+                    icon: Icons.night_shelter_outlined,
                     label: 'Shelter',
                     onTap: () {},
                   ),
@@ -97,7 +116,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget to build the info cards for news and alerts
+  // Helper widget for static info cards like "Today's News"
   Widget _buildInfoCard(String title) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -117,22 +136,17 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Placeholder for content
           Container(
-            height: 20,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+              height: 20,
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8))),
           const SizedBox(height: 10),
           Container(
-            height: 20,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+              height: 20,
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8))),
         ],
       ),
     );

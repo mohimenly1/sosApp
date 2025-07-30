@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainScaffold extends StatefulWidget {
   final Widget body;
@@ -9,43 +11,71 @@ class MainScaffold extends StatefulWidget {
 }
 
 class _MainScaffoldState extends State<MainScaffold> {
-  int _selectedIndex = 2; // Default to the home/SOS screen
+  int _selectedIndex = 2;
+  String? _userRole;
 
-  // This function handles taps on the bottom navigation bar items
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserRole();
+  }
+
+  Future<void> _fetchUserRole() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (mounted) {
+          setState(() {
+            _userRole = doc.data()?['userType'];
+          });
+        }
+      } catch (e) {
+        // Handle potential errors, e.g., user document not found
+        print("Could not fetch user role: $e");
+      }
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    // Add navigation logic here based on index
-    // For example:
-    // if (index == 0) Navigator.pushNamed(context, '/map');
-    // if (index == 4) Navigator.pushNamed(context, '/chat');
+    // TODO: Add navigation logic here based on index
+  }
+
+  void _onFabTapped() {
+    // Differentiated action based on user role
+    if (_userRole == 'rescue_team') {
+      Navigator.pushNamed(context, '/send_alert');
+    } else {
+      Navigator.pushNamed(context, '/sos');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.body,
-      // The central floating action button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle SOS action
-          Navigator.pushNamed(context, '/sos');
-        },
+        onPressed: _onFabTapped,
         backgroundColor: Colors.white,
         elevation: 4.0,
         shape: const CircleBorder(),
-        child: const Text(
-          'SOS',
+        child: Text(
+          // Change FAB text based on role
+          _userRole == 'rescue_team' ? 'ALERT' : 'SOS',
           style: TextStyle(
-            color: Colors.red,
+            color: Colors.red.shade700,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // The custom bottom navigation bar
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xFF0A2342),
         shape: const CircularNotchedRectangle(),
@@ -72,7 +102,6 @@ class _MainScaffoldState extends State<MainScaffold> {
     );
   }
 
-  // Helper widget to build each navigation item
   Widget _buildNavItem(
       {required IconData icon, required int index, required String label}) {
     return IconButton(

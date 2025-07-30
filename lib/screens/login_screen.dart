@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; // 1. Import Firebase Messaging
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,9 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Main function to handle the sign-in process
   void _signIn() async {
-    // 1. Validate the form
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -33,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 2. Sign in the user with Firebase Auth
       final userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -42,7 +40,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final user = userCredential.user;
       if (user != null) {
-        // 3. Fetch user data from Firestore to get their role
+        // 2. Get the latest FCM token
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        // 3. Update the token in Firestore
+        if (fcmToken != null) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .update({'fcmToken': fcmToken});
+        }
+
+        // 4. Fetch user data and navigate
         final docSnapshot = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -50,12 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (docSnapshot.exists) {
           final userType = docSnapshot.data()?['userType'];
-          // 4. Navigate based on the user's role
           if (mounted) {
             _navigateUser(userType);
           }
         } else {
-          // Handle case where user exists in Auth but not in Firestore
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content: Text('User data not found. Please contact support.'),
@@ -64,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      // 5. Handle specific Firebase authentication errors
       String message = 'An error occurred. Please check your credentials.';
       if (e.code == 'user-not-found' ||
           e.code == 'wrong-password' ||
@@ -75,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     } catch (e) {
-      // Handle other generic errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('An unexpected error occurred: $e'),
@@ -88,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Helper function to handle navigation based on user role
   void _navigateUser(String? userType) {
     switch (userType) {
       case 'individual':
@@ -101,13 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacementNamed(context, '/gov_home');
         break;
       default:
-        // Fallback to the generic home screen if type is null or unknown
         Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ... The rest of your build method remains exactly the same
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -141,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email', // Changed for clarity
+                      labelText: 'Email',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -185,13 +189,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.end, // Aligned to the right
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () {
-                          // TODO: Implement forgot password functionality
-                        },
+                        onPressed: () {},
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(color: Color(0xFF0A2342)),

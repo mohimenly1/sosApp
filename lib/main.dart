@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:resq_track4/screens/medical_file_screen.dart';
-import 'package:resq_track4/screens/rescue_team/add_team_screen.dart';
-import 'package:resq_track4/screens/rescue_team/manage_teams_screen.dart';
-import 'package:resq_track4/screens/settings_screen.dart';
-import 'package:resq_track4/screens/sos_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
+import 'package:resq_track4/screens/all_alerts_screen.dart';
+import 'package:resq_track4/screens/rescue_home_screen.dart';
 import 'firebase_options.dart';
+import 'services/notification_service.dart'; // Import our new service
 
+// ... (Your other screen imports and placeholder widgets)
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/rescue_home_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
-import 'widgets/main_scaffold.dart'; // Import the new scaffold
+import 'screens/sos_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/medical_file_screen.dart';
 
-// Placeholder screens for the other roles
+import 'screens/rescue_team/manage_teams_screen.dart';
+import 'screens/rescue_team/add_team_screen.dart';
+import 'screens/rescue_team/send_alert_screen.dart';
+import 'widgets/main_scaffold.dart';
 
 class GovHomeScreen extends StatelessWidget {
   const GovHomeScreen({super.key});
@@ -31,11 +35,25 @@ class GovHomeScreen extends StatelessWidget {
   }
 }
 
+// Function to handle messages when the app is in the background or terminated
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("Handling a background message: ${message.messageId}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Set the background messaging handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize our notification service
+  await NotificationService().initNotifications();
+
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
@@ -52,6 +70,7 @@ class MyApp extends StatelessWidget {
       title: 'ResQTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // ... (Your theme data remains the same)
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0A2342)),
@@ -62,26 +81,6 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
               color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: Color(0xFF0A2342),
-              width: 2.0,
-            ),
-          ),
         ),
       ),
       initialRoute: '/splash',
@@ -99,6 +98,8 @@ class MyApp extends StatelessWidget {
         '/medical_file': (context) => const MedicalFileScreen(),
         '/manage_teams': (context) => const ManageTeamsScreen(),
         '/add_team': (context) => const AddTeamScreen(),
+        '/send_alert': (context) => const SendAlertScreen(),
+        '/all_alerts': (context) => const AllAlertsScreen(),
       },
     );
   }
