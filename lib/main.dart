@@ -21,6 +21,7 @@ import 'screens/rescue_team/manage_teams_screen.dart';
 import 'screens/rescue_team/add_team_screen.dart';
 import 'screens/rescue_team/send_alert_screen.dart';
 import 'widgets/main_scaffold.dart';
+import 'auth/auth_gate.dart'; // Import the AuthGate
 
 class GovHomeScreen extends StatelessWidget {
   const GovHomeScreen({super.key});
@@ -79,7 +80,7 @@ class MyApp extends StatelessWidget {
               color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      initialRoute: '/splash',
+      home: const SplashScreen(),
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),

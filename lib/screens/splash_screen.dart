@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../auth/auth_gate.dart'; // 1. Import the new AuthGate
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,24 +13,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       _requestPermissionsAndNavigate();
     });
   }
 
   Future<void> _requestPermissionsAndNavigate() async {
-    final List<Permission> permissionsToRequest = [
+    // Requesting permissions remains the same
+    await [
       Permission.location,
       Permission.notification,
       Permission.camera,
       Permission.microphone,
-    ];
-
-    await permissionsToRequest.request();
+    ].request();
 
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+      // 2. Navigate to the AuthGate instead of the login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthGate()),
+      );
     }
   }
 
@@ -42,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'lib/assets/logo.jpeg',
+              'lib/assets/logo.jpeg', // Make sure you have this asset
               width: 180,
               height: 180,
             ),

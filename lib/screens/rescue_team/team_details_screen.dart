@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../services/database_helper.dart'; // Import the database helper
 
 class TeamDetailsScreen extends StatefulWidget {
   final String teamId;
@@ -16,44 +16,36 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
   Map<String, dynamic>? _teamData;
   Map<String, dynamic>? _routeData;
   bool _isLoading = true;
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _loadDataFromDb();
   }
 
-  Future<void> _fetchData() async {
+  // This function now loads all data from the local SQLite database
+  Future<void> _loadDataFromDb() async {
     try {
-      // 1. Fetch team data
-      final teamDoc = await FirebaseFirestore.instance
-          .collection('rescue_teams')
-          .doc(widget.teamId)
-          .get();
-      if (!teamDoc.exists) {
-        throw Exception("Team not found");
-      }
-      final teamData = teamDoc.data()!;
+      // 1. Fetch team data from local DB
+      final teamData = await _dbHelper.getTeamById(widget.teamId);
+      if (teamData == null) throw Exception("Team not found in local DB");
 
-      // 2. Fetch associated route data
+      // 2. Fetch associated route data from local DB
       final routeId = teamData['assignedRouteId'];
-      final routeDoc = await FirebaseFirestore.instance
-          .collection('evacuation_routes')
-          .doc(routeId)
-          .get();
-      if (!routeDoc.exists) {
-        throw Exception("Route not found");
-      }
+      final routeData = await _dbHelper.getRouteById(routeId);
+      if (routeData == null) throw Exception("Route not found in local DB");
 
       setState(() {
         _teamData = teamData;
-        _routeData = routeDoc.data()!;
+        _routeData = routeData;
         _isLoading = false;
       });
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load details: $e')),
+        SnackBar(
+            content: Text('Failed to load details from local storage: $e')),
       );
     }
   }
@@ -73,10 +65,11 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
   }
 
   Widget _buildDetailsView() {
-    final startPointGeo = _routeData!['startPoint'] as GeoPoint;
-    final endPointGeo = _routeData!['endPoint'] as GeoPoint;
-    final startPoint = LatLng(startPointGeo.latitude, startPointGeo.longitude);
-    final endPoint = LatLng(endPointGeo.latitude, endPointGeo.longitude);
+    // Read coordinates from the local data
+    final startPoint =
+        LatLng(_routeData!['startPoint_lat'], _routeData!['startPoint_lon']);
+    final endPoint =
+        LatLng(_routeData!['endPoint_lat'], _routeData!['endPoint_lon']);
 
     return SingleChildScrollView(
       child: Column(
@@ -142,8 +135,9 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                 const SizedBox(height: 8),
                 _buildDetailRow(Icons.security, 'Safety Level',
                     _routeData!['safetyLevel'].toString()),
+                // Read boolean from integer (0 or 1)
                 _buildDetailRow(Icons.wifi_off, 'Offline Available',
-                    _routeData!['isOfflineAvailable'] ? 'Yes' : 'No'),
+                    _routeData!['isOfflineAvailable'] == 1 ? 'Yes' : 'No'),
               ],
             ),
           ),
