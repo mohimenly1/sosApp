@@ -7,11 +7,12 @@ class RescueHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The main scaffold provides the consistent bottom navigation bar
     return MainScaffold(
       body: Scaffold(
         appBar: AppBar(
           title: const Text('Rescue Dashboard'),
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false, // Removes the back button
         ),
         body: GridView.count(
           padding: const EdgeInsets.all(16.0),
@@ -29,15 +30,26 @@ class RescueHomeScreen extends StatelessWidget {
             ),
             HomeGridButton(
               icon: Icons.warning_amber_rounded,
-              label: 'Active Alerts',
+              label: 'Active Reports', // Renamed for clarity
               onTap: () {
                 Navigator.pushNamed(context, '/active_reports');
               },
             ),
+            // UPDATED: This button now navigates to the map screen
             HomeGridButton(
               icon: Icons.map_outlined,
               label: 'Live Map',
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/user_map');
+              },
+            ),
+            // NEW: Added button for the AI Assistant
+            HomeGridButton(
+              icon: Icons.smart_toy_outlined,
+              label: 'AI Assistant',
+              onTap: () {
+                Navigator.pushNamed(context, '/chat');
+              },
             ),
             HomeGridButton(
               icon: Icons.settings_outlined,
