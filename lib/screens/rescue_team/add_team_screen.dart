@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart'; // 1. Import Geolocator
 
 class AddTeamScreen extends StatefulWidget {
   const AddTeamScreen({super.key});
@@ -22,6 +23,35 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
 
   double _safetyLevel = 3.0;
   bool _isOfflineAvailable = false;
+
+  // 2. Add a MapController and a variable for the initial center
+  final MapController _mapController = MapController();
+  LatLng _initialCenter =
+      const LatLng(32.885353, 13.180161); // Default to Tripoli
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocationAndCenterMap();
+  }
+
+  // 3. New function to get current location and update the map
+  Future<void> _getCurrentLocationAndCenterMap() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (mounted) {
+        setState(() {
+          _initialCenter = LatLng(position.latitude, position.longitude);
+        });
+        _mapController.move(_initialCenter, 13.0);
+      }
+    } catch (e) {
+      print("Could not get location: $e");
+      // If location fails, the map will remain centered on the default location
+    }
+  }
 
   Future<void> _saveTeamAndRoute() async {
     if (!_formKey.currentState!.validate()) return;
@@ -45,9 +75,8 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
           await FirebaseFirestore.instance.collection('evacuation_routes').add({
         'startPoint': GeoPoint(_startPoint!.latitude, _startPoint!.longitude),
         'endPoint': GeoPoint(_endPoint!.latitude, _endPoint!.longitude),
-        'safetyLevel': _safetyLevel.toInt(), // Using the value from the slider
-        'isOfflineAvailable':
-            _isOfflineAvailable, // Using the value from the switch
+        'safetyLevel': _safetyLevel.toInt(),
+        'isOfflineAvailable': _isOfflineAvailable,
         'lastModifiedBy': user.uid,
         'lastModifiedAt': Timestamp.now(),
       });
@@ -113,10 +142,11 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
               SizedBox(
                 height: 300,
                 child: FlutterMap(
+                  // 4. Use the map controller and initial center variable
+                  mapController: _mapController,
                   options: MapOptions(
-                    initialCenter:
-                        LatLng(32.885353, 13.180161), // Tripoli, Libya
-                    initialZoom: 9.2,
+                    initialCenter: _initialCenter,
+                    initialZoom: 13.0, // A closer zoom level
                     onTap: (tapPosition, point) {
                       setState(() {
                         if (_startPoint == null || _endPoint != null) {
