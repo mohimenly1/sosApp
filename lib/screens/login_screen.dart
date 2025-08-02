@@ -188,7 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/forgot_password');
+                        },
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(color: Color(0xFF0A2342)),

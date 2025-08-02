@@ -41,7 +41,9 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingsTile(
               icon: Icons.person_outline,
               title: "Profile",
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/profile');
+              },
             ),
             _buildSettingsTile(
               icon: Icons.medical_services_outlined,

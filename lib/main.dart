@@ -3,9 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
 import 'package:resq_track4/screens/all_alerts_screen.dart';
+import 'package:resq_track4/screens/forgot_password_screen.dart';
+import 'package:resq_track4/screens/profile_screen.dart';
 import 'package:resq_track4/screens/rescue_home_screen.dart';
 import 'package:resq_track4/screens/rescue_team/active_reports_screen.dart';
 import 'package:resq_track4/screens/safe_routes_screen.dart';
+import 'package:resq_track4/screens/user_map_screen.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
 import 'screens/splash_screen.dart';
@@ -98,6 +101,9 @@ class MyApp extends StatelessWidget {
         '/all_alerts': (context) => const AllAlertsScreen(),
         '/active_reports': (context) => const ActiveReportsScreen(),
         '/safe_route': (context) => const SafeRoutesScreen(),
+        '/forgot_password': (context) => const ForgotPasswordScreen(),
+        '/user_map': (context) => const UserMapScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

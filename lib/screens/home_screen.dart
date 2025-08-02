@@ -101,7 +101,9 @@ class HomeScreen extends StatelessWidget {
                   HomeGridButton(
                     icon: Icons.map_outlined,
                     label: 'Map',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/user_map');
+                    },
                   ),
                 ],
               ),
