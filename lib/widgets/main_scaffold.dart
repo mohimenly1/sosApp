@@ -39,10 +39,34 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
   }
 
+  // MODIFIED: This function now handles navigation for different roles
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    switch (index) {
+      case 0: // Map
+        Navigator.pushNamed(context, '/user_map');
+        break;
+      case 1: // Reports (for rescue teams) or Alerts (for users)
+        if (_userRole == 'rescue_team') {
+          Navigator.pushNamed(context, '/active_reports');
+        } else {
+          Navigator.pushNamed(context, '/all_alerts');
+        }
+        break;
+      case 3: // Alerts
+        Navigator.pushNamed(context, '/all_alerts');
+        break;
+      case 4: // Chat
+        if (_userRole == 'rescue_team') {
+          Navigator.pushNamed(context, '/chat_list');
+        } else {
+          Navigator.pushNamed(context, '/user_chat_list');
+        }
+        break;
+    }
   }
 
   void _onFabTapped() {
@@ -63,7 +87,6 @@ class _MainScaffoldState extends State<MainScaffold> {
         elevation: 4.0,
         shape: const CircleBorder(),
         child: Text(
-          // Change FAB text based on role
           _userRole == 'rescue_team' ? 'ALERT' : 'SOS',
           style: TextStyle(
             color: Colors.red.shade700,
@@ -84,8 +107,10 @@ class _MainScaffoldState extends State<MainScaffold> {
             children: <Widget>[
               _buildNavItem(icon: Icons.map_outlined, index: 0, label: 'Map'),
               _buildNavItem(
-                  icon: Icons.list_alt_outlined, index: 1, label: 'Reports'),
-              const SizedBox(width: 40), // The space for the notch
+                  icon: Icons.list_alt_outlined,
+                  index: 1,
+                  label: _userRole == 'rescue_team' ? 'Reports' : 'Alerts'),
+              const SizedBox(width: 40),
               _buildNavItem(
                   icon: Icons.notifications_outlined,
                   index: 3,

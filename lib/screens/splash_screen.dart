@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../auth/auth_gate.dart'; // 1. Import the new AuthGate
+import '../auth/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,22 +13,27 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // Wait for 3 seconds before requesting permissions and navigating
     Future.delayed(const Duration(seconds: 3), () {
       _requestPermissionsAndNavigate();
     });
   }
 
   Future<void> _requestPermissionsAndNavigate() async {
-    // Requesting permissions remains the same
+    // UPDATED: A comprehensive list of all permissions needed for the app.
+    // This ensures all features like maps, camera, and notifications work correctly.
     await [
-      Permission.location,
-      Permission.notification,
-      Permission.camera,
-      Permission.microphone,
+      Permission.location, // For all map and location features.
+      Permission.notification, // To receive emergency alerts.
+      Permission.camera, // To take photos for reports.
+      Permission.microphone, // For voice notes in reports.
+      Permission.storage, // For accessing files on older Android versions.
+      Permission
+          .photos, // For accessing the photo gallery on newer Android/iOS.
     ].request();
 
     if (mounted) {
-      // 2. Navigate to the AuthGate instead of the login screen
+      // Navigate to the AuthGate which will direct the user to the correct screen.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const AuthGate()),

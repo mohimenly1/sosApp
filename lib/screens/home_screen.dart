@@ -85,13 +85,15 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   HomeGridButton(
                     icon: Icons.smart_toy_outlined,
-                    label: 'chatbot',
+                    label: 'Chatbot',
                     onTap: () => Navigator.pushNamed(context, '/chat'),
                   ),
                   HomeGridButton(
                     icon: Icons.night_shelter_outlined,
                     label: 'Shelter',
-                    onTap: () => Navigator.pushNamed(context, '/safe_route'),
+                    onTap: () {
+                      // TODO: Navigate to shelters or safe routes screen
+                    },
                   ),
                   HomeGridButton(
                     icon: Icons.cloud_outlined,
@@ -103,6 +105,14 @@ class HomeScreen extends StatelessWidget {
                     label: 'Map',
                     onTap: () {
                       Navigator.pushNamed(context, '/user_map');
+                    },
+                  ),
+                  // NEW: Added a dedicated button for sending a report
+                  HomeGridButton(
+                    icon: Icons.report_gmailerrorred,
+                    label: 'Send Report',
+                    onTap: () {
+                      Navigator.pushNamed(context, '/send_report');
                     },
                   ),
                 ],

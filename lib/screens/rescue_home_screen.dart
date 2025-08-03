@@ -13,6 +13,16 @@ class RescueHomeScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Rescue Dashboard'),
           automaticallyImplyLeading: false, // Removes the back button
+          // NEW: Added the settings icon to the AppBar
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, color: Colors.white),
+              onPressed: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+              tooltip: 'Settings',
+            ),
+          ],
         ),
         body: GridView.count(
           padding: const EdgeInsets.all(16.0),
@@ -30,12 +40,11 @@ class RescueHomeScreen extends StatelessWidget {
             ),
             HomeGridButton(
               icon: Icons.warning_amber_rounded,
-              label: 'Active Reports', // Renamed for clarity
+              label: 'Active Reports',
               onTap: () {
                 Navigator.pushNamed(context, '/active_reports');
               },
             ),
-            // UPDATED: This button now navigates to the map screen
             HomeGridButton(
               icon: Icons.map_outlined,
               label: 'Live Map',
@@ -43,7 +52,6 @@ class RescueHomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/user_map');
               },
             ),
-            // NEW: Added button for the AI Assistant
             HomeGridButton(
               icon: Icons.smart_toy_outlined,
               label: 'AI Assistant',
@@ -52,11 +60,9 @@ class RescueHomeScreen extends StatelessWidget {
               },
             ),
             HomeGridButton(
-              icon: Icons.settings_outlined,
-              label: 'Settings',
-              onTap: () {
-                Navigator.pushNamed(context, '/settings');
-              },
+              icon: Icons.chat_bubble_outline,
+              label: 'Chat Box',
+              onTap: () => Navigator.pushNamed(context, '/chat_list'),
             ),
           ],
         ),
