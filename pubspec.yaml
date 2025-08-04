@@ -32,6 +32,7 @@ dependencies:
   geolocator: ^12.0.0
   image_picker: ^1.1.2
   flutter_local_notifications: ^18.0.1
+  easy_localization: ^3.0.8
 
 
 
@@ -48,3 +49,4 @@ flutter:
   assets:
     - lib/assets/Untitled.gif
     - lib/assets/logo.jpeg
+    - assets/translations/

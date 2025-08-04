@@ -72,16 +72,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
             LatLng(position.latitude, position.longitude), 15.0);
       }
     } catch (e) {
-      if (mounted) setState(() => _statusMessage = 'Could not get location.');
+      if (mounted) setState(() => _statusMessage = '');
     }
   }
 
+  // MODIFIED: This function now opens the camera directly.
   Future<void> _pickImage() async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        _deleteAudio();
+        _deleteAudio(); // Clear any existing audio recording
         _imageFile = File(pickedFile.path);
       });
     }
@@ -174,11 +175,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
       String? audioUrl;
       String reportType = 'text';
 
-      // 1. Upload files and explicitly check for failure
       if (_imageFile != null) {
         imageUrl = await _uploadFile(_imageFile!, 'report_images');
         if (imageUrl == null) {
-          // Throw an error to stop the process if upload fails
           throw Exception(
               "Image upload failed. Please check your connection or storage rules.");
         }
@@ -186,20 +185,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (_audioPath != null) {
         audioUrl = await _uploadFile(File(_audioPath!), 'report_audio');
         if (audioUrl == null) {
-          // Throw an error to stop the process if upload fails
           throw Exception(
               "Audio upload failed. Please check your connection or storage rules.");
         }
       }
 
-      // 2. Determine the primary report type
       if (audioUrl != null) {
         reportType = 'audio';
       } else if (imageUrl != null) {
         reportType = 'image';
       }
 
-      // 3. Prepare the data for Firestore
       final reportData = {
         'userId': user.uid,
         'reportType': reportType,
@@ -222,7 +218,6 @@ class _SendReportScreenState extends State<SendReportScreen> {
       );
       Navigator.of(context).pop();
     } catch (e) {
-      // This will now show a more specific error message if an upload fails
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
               'Failed to send report: ${e.toString().replaceFirst("Exception: ", "")}')));
@@ -338,19 +333,26 @@ class _SendReportScreenState extends State<SendReportScreen> {
                       ),
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _sendReport,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+              // MODIFIED: The button is now wider and centered.
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _sendReport,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Send Report',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18)),
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Send Report',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18)),
               ),
             ],
           ),

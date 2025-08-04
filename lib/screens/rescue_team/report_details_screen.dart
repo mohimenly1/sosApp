@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:audioplayers/audioplayers.dart'; // To play audio from URL
 import 'active_reports_screen.dart'; // For the UserInfoWidget
 
 class ReportDetailsScreen extends StatefulWidget {
@@ -96,7 +97,6 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
     );
   }
 
-  // MODIFIED: Now also saves the assignedRouteId to the report
   Future<void> _shareRoute({
     required String distressedUserId,
     required String routeId,
@@ -118,7 +118,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
           FirebaseFirestore.instance.collection('reports').doc(widget.reportId);
       batch.update(reportDocRef, {
         'status': 'responded',
-        'assignedRouteId': routeId, // Link the route to the report
+        'assignedRouteId': routeId,
       });
 
       await batch.commit();
@@ -128,7 +128,6 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
             content: Text('Safe route shared successfully!'),
             backgroundColor: Colors.green),
       );
-      // Refresh the screen to show the new map
       setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -196,13 +195,12 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                     children: [
                       _buildDetailRow(Icons.person, 'User',
                           UserInfoWidget(userId: reportData['userId'])),
-                      _buildDetailRow(Icons.description, 'Description',
-                          Text(reportData['content'])),
-                      _buildDetailRow(Icons.category, 'Report Type',
-                          Text(reportData['reportType'])),
+                      // UPDATED: Content section now handles text, image, and audio
+                      _buildContentSection(reportData),
+                      _buildDetailRow(Icons.category, 'Disaster Type',
+                          Text(reportData['disasterType'] ?? 'N/A')),
                       _buildDetailRow(Icons.timer, 'Time', Text(formattedDate)),
                       const SizedBox(height: 20),
-                      // MODIFIED: Conditional widget display
                       if (status == 'responded' &&
                           reportData['assignedRouteId'] != null)
                         SharedRouteMap(routeId: reportData['assignedRouteId'])
@@ -231,6 +229,46 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
     );
   }
 
+  // NEW: A dedicated widget to display different types of content
+  Widget _buildContentSection(Map<String, dynamic> data) {
+    final String description = data['content'] ?? '';
+    final String? imageUrl = data['imageUrl'];
+    final String? audioUrl = data['audioUrl'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDetailRow(
+            Icons.description,
+            'Description',
+            Text(description.isNotEmpty
+                ? description
+                : 'No description provided.')),
+        if (imageUrl != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) => progress == null
+                    ? child
+                    : const Center(child: CircularProgressIndicator()),
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error, color: Colors.red),
+              ),
+            ),
+          ),
+        if (audioUrl != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: AudioPlayerWidget(url: audioUrl),
+          ),
+      ],
+    );
+  }
+
   Widget _buildDetailRow(IconData icon, String title, Widget content) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -247,7 +285,53 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 }
 
-// NEW: A dedicated widget to display the shared safe route map
+// NEW: A dedicated widget to play audio from a URL
+class AudioPlayerWidget extends StatefulWidget {
+  final String url;
+  const AudioPlayerWidget({super.key, required this.url});
+
+  @override
+  State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
+}
+
+class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlayer() async {
+    if (_isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.play(UrlSource(widget.url));
+    }
+    setState(() {
+      _isPlaying = !_isPlaying;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      child: ListTile(
+        leading: const Icon(Icons.audiotrack, color: Color(0xFF0A2342)),
+        title: const Text('Voice Report'),
+        trailing: IconButton(
+          icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+          onPressed: _togglePlayer,
+        ),
+      ),
+    );
+  }
+}
+
+// ... (SharedRouteMap and UserInfoWidget remain the same)
 class SharedRouteMap extends StatelessWidget {
   final String routeId;
   const SharedRouteMap({super.key, required this.routeId});

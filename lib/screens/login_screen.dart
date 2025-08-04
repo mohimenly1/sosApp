@@ -127,15 +127,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const Text(
-                    'ResQTrack',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0A2342),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  // const Text(
+                  //   'ResQTrack',
+                  //   style: TextStyle(
+                  //     fontSize: 32,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Color(0xFF0A2342),
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  // ),
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _emailController,

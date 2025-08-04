@@ -10,154 +10,150 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _emailController = TextEditingController(); // To display the email
-  bool _isLoading = true;
   final String? _userId = FirebaseAuth.instance.currentUser?.uid;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
+  // A single function to fetch both user and medical data
+  Future<Map<String, dynamic>> _getCombinedUserData() async {
+    if (_userId == null) throw Exception("User not logged in");
 
-  Future<void> _loadUserData() async {
-    if (_userId == null) {
-      setState(() => _isLoading = false);
-      return;
-    }
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_userId)
+    // Fetch user data
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(_userId).get();
+    if (!userDoc.exists) throw Exception("User data not found");
+
+    final userData = userDoc.data()!;
+    Map<String, dynamic> combinedData = Map.from(userData);
+
+    // Fetch medical data if the link exists
+    final medicalFileId = userData['medicalFileId'];
+    if (medicalFileId != null) {
+      final medicalDoc = await FirebaseFirestore.instance
+          .collection('medical_files')
+          .doc(medicalFileId)
           .get();
-      if (userDoc.exists) {
-        final data = userDoc.data()!;
-        _nameController.text = data['name'] ?? '';
-        _phoneController.text = data['phone'] ?? '';
-        _emailController.text = data['email'] ?? 'No email found';
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load profile data: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
+      if (medicalDoc.exists) {
+        combinedData.addAll(medicalDoc.data()!);
       }
     }
-  }
-
-  Future<void> _updateProfile() async {
-    if (!_formKey.currentState!.validate() || _userId == null) return;
-
-    setState(() => _isLoading = true);
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(_userId).update({
-        'name': _nameController.text.trim(),
-        'phone': _phoneController.text.trim(),
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<void> _sendPasswordReset() async {
-    final email = FirebaseAuth.instance.currentUser?.email;
-    if (email == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not find user email.')),
-      );
-      return;
-    }
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Password reset link sent to your email.'),
-            backgroundColor: Colors.green),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send reset link: $e')),
-      );
-    }
+    return combinedData;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Color(0xFF0A2342),
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Full Name'),
-                      validator: (value) =>
-                          value!.isEmpty ? 'Please enter your name' : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration:
-                          const InputDecoration(labelText: 'Phone Number'),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) => value!.isEmpty
-                          ? 'Please enter your phone number'
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration:
-                          const InputDecoration(labelText: 'Email Address'),
-                      enabled: false, // User cannot change their email
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _updateProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0A2342),
-                        minimumSize: const Size(double.infinity, 50),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              // TODO: Navigate to an "Edit Profile" screen
+            },
+            tooltip: 'Edit Profile',
+          ),
+        ],
+      ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _getCombinedUserData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError || !snapshot.hasData) {
+            return Center(
+                child: Text('Failed to load profile: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data!;
+
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                // Profile Header Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 8,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.grey,
+                        child:
+                            Icon(Icons.person, size: 40, color: Colors.white),
                       ),
-                      child: const Text('Save Changes',
-                          style: TextStyle(color: Colors.white)),
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: _sendPasswordReset,
-                      child: const Text('Change Password',
-                          style: TextStyle(color: Color(0xFF0A2342))),
-                    )
-                  ],
+                      const SizedBox(height: 16),
+                      Text(
+                        data['name'] ?? 'N/A',
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        (data['userType'] as String?)
+                                ?.replaceAll('_', ' ')
+                                .toUpperCase() ??
+                            'INDIVIDUAL',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 40),
+                // Details Section
+                _buildDetailRow(
+                    "Date of Birth:", "May 15, 1994"), // Placeholder
+                _buildDetailRow(
+                    "Medical Condition:", data['chronicDiseases'] ?? 'None'),
+                _buildDetailRow("Allergies:", data['allergies'] ?? 'None'),
+                _buildDetailRow("Blood Type:", data['bloodType'] ?? 'N/A'),
+              ],
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Helper widget to create the classic detail row
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0A2342),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

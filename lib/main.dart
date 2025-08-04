@@ -28,6 +28,7 @@ import 'screens/rescue_team/add_team_screen.dart';
 import 'screens/rescue_team/send_alert_screen.dart';
 import 'widgets/main_scaffold.dart';
 import 'auth/auth_gate.dart'; // Import the AuthGate
+import 'package:easy_localization/easy_localization.dart'; // 1. Import easy_localization
 
 class GovHomeScreen extends StatelessWidget {
   const GovHomeScreen({super.key});
@@ -62,7 +63,16 @@ void main() async {
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
   );
-  runApp(const MyApp());
+
+  await EasyLocalization.ensureInitialized();
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      path: 'assets/translations', // The path to your translation files
+      fallbackLocale: const Locale('en'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -71,6 +81,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       title: 'ResQTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

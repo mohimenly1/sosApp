@@ -1,0 +1,20 @@
+{
+    "settings": "Settings",
+    "profile": "Profile",
+    "medical_file": "Medical File",
+    "language": "Language",
+    "privacy_policy": "Privacy Policy",
+    "sign_out": "Sign Out",
+    "profile_title": "Profile",
+    "date_of_birth": "Date of Birth:",
+    "medical_condition": "Medical Condition:",
+    "allergies": "Allergies:",
+    "blood_type": "Blood Type:",
+    "individual": "INDIVIDUAL",
+    "rescue_team": "RESCUE TEAM",
+    "government_entity": "GOVERNMENT ENTITY",
+    "none": "None",
+    "not_available": "N/A",
+    "edit_profile_tooltip": "Edit Profile"
+  }
+  

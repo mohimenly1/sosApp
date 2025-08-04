@@ -91,9 +91,7 @@ class HomeScreen extends StatelessWidget {
                   HomeGridButton(
                     icon: Icons.night_shelter_outlined,
                     label: 'Shelter',
-                    onTap: () {
-                      // TODO: Navigate to shelters or safe routes screen
-                    },
+                    onTap: () => Navigator.pushNamed(context, '/safe_route'),
                   ),
                   HomeGridButton(
                     icon: Icons.cloud_outlined,

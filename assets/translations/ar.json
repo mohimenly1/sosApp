@@ -1,0 +1,19 @@
+{
+  "settings": "الإعدادات",
+  "profile": "الملف الشخصي",
+  "medical_file": "الملف الطبي",
+  "language": "اللغة",
+  "privacy_policy": "سياسة الخصوصية",
+  "sign_out": "تسجيل الخروج",
+  "profile_title": "الملف الشخصي",
+  "date_of_birth": "تاريخ الميلاد:",
+  "medical_condition": "الحالة الطبية:",
+  "allergies": "الحساسية:",
+  "blood_type": "فصيلة الدم:",
+  "individual": "فرد",
+  "rescue_team": "فريق إنقاذ",
+  "government_entity": "جهة حكومية",
+  "none": "لا يوجد",
+  "not_available": "غير متوفر",
+  "edit_profile_tooltip": "تعديل الملف الشخصي"
+}
