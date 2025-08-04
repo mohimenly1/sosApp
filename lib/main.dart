@@ -4,6 +4,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
 import 'package:resq_track4/screens/all_alerts_screen.dart';
 import 'package:resq_track4/screens/chat/user_chat_list_screen.dart';
+import 'package:resq_track4/screens/edit_profile_screen.dart';
 import 'package:resq_track4/screens/forgot_password_screen.dart';
 import 'package:resq_track4/screens/profile_screen.dart';
 import 'package:resq_track4/screens/rescue_home_screen.dart';
@@ -12,6 +13,7 @@ import 'package:resq_track4/screens/rescue_team/chat_list_screen.dart';
 import 'package:resq_track4/screens/safe_routes_screen.dart';
 import 'package:resq_track4/screens/send_report_screen.dart';
 import 'package:resq_track4/screens/user_map_screen.dart';
+import 'package:resq_track4/screens/weather_screen.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
 import 'screens/splash_screen.dart';
@@ -123,6 +125,8 @@ class MyApp extends StatelessWidget {
         '/chat_list': (context) => const ChatListScreen(),
         '/user_chat_list': (context) => const UserChatListScreen(),
         '/send_report': (context) => const SendReportScreen(),
+        '/edit_profile': (context) => const EditProfileScreen(),
+        '/weather': (context) => const WeatherScreen(),
       },
     );
   }

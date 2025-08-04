@@ -96,21 +96,15 @@ class HomeScreen extends StatelessWidget {
                   HomeGridButton(
                     icon: Icons.cloud_outlined,
                     label: 'Weather',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/weather');
+                    },
                   ),
                   HomeGridButton(
                     icon: Icons.map_outlined,
                     label: 'Map',
                     onTap: () {
                       Navigator.pushNamed(context, '/user_map');
-                    },
-                  ),
-                  // NEW: Added a dedicated button for sending a report
-                  HomeGridButton(
-                    icon: Icons.report_gmailerrorred,
-                    label: 'Send Report',
-                    onTap: () {
-                      Navigator.pushNamed(context, '/send_report');
                     },
                   ),
                 ],

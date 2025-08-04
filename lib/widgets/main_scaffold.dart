@@ -39,8 +39,10 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
   }
 
-  // MODIFIED: This function now handles navigation for different roles
   void _onItemTapped(int index) {
+    // Prevent navigating to the same page
+    if (_selectedIndex == index) return;
+
     setState(() {
       _selectedIndex = index;
     });
@@ -53,7 +55,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         if (_userRole == 'rescue_team') {
           Navigator.pushNamed(context, '/active_reports');
         } else {
-          Navigator.pushNamed(context, '/all_alerts');
+          Navigator.pushNamed(context, '/send_report');
         }
         break;
       case 3: // Alerts
@@ -111,16 +113,65 @@ class _MainScaffoldState extends State<MainScaffold> {
                   index: 1,
                   label: _userRole == 'rescue_team' ? 'Reports' : 'Alerts'),
               const SizedBox(width: 40),
-              _buildNavItem(
-                  icon: Icons.notifications_outlined,
-                  index: 3,
-                  label: 'Alerts'),
+              // MODIFIED: This now includes the notification badge
+              _buildAlertsNavItem(),
               _buildNavItem(
                   icon: Icons.chat_bubble_outline, index: 4, label: 'Chat'),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // NEW: A dedicated widget for the Alerts button with a notification badge
+  Widget _buildAlertsNavItem() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('alerts').snapshots(),
+      builder: (context, snapshot) {
+        final alertCount = snapshot.data?.docs.length ?? 0;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.notifications_outlined,
+                color: _selectedIndex == 3
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.6),
+                size: 28,
+              ),
+              onPressed: () => _onItemTapped(3),
+              tooltip: 'Alerts',
+            ),
+            if (alertCount > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '$alertCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

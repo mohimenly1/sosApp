@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:url_launcher/url_launcher.dart'; // For opening links
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,30 +14,72 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final String? _userId = FirebaseAuth.instance.currentUser?.uid;
 
-  // A single function to fetch both user and medical data
-  Future<Map<String, dynamic>> _getCombinedUserData() async {
-    if (_userId == null) throw Exception("User not logged in");
-
-    // Fetch user data
+  Future<Map<String, dynamic>?> _getUserData() async {
+    if (_userId == null) return null;
     final userDoc =
         await FirebaseFirestore.instance.collection('users').doc(_userId).get();
-    if (!userDoc.exists) throw Exception("User data not found");
+    return userDoc.data();
+  }
 
-    final userData = userDoc.data()!;
-    Map<String, dynamic> combinedData = Map.from(userData);
+  String _translateUserType(String? userType) {
+    switch (userType) {
+      case 'individual':
+        return "individual".tr();
+      case 'rescue_team':
+        return "rescue_team".tr();
+      case 'government_entity':
+        return "government_entity".tr();
+      default:
+        return "individual".tr();
+    }
+  }
 
-    // Fetch medical data if the link exists
-    final medicalFileId = userData['medicalFileId'];
-    if (medicalFileId != null) {
-      final medicalDoc = await FirebaseFirestore.instance
-          .collection('medical_files')
-          .doc(medicalFileId)
-          .get();
-      if (medicalDoc.exists) {
-        combinedData.addAll(medicalDoc.data()!);
+  Future<void> _launchURL() async {
+    final Uri url = Uri.parse('https://emsc.gov.ly/');
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    // Show confirmation dialog first
+    final bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: const Text(
+            'Are you sure you want to permanently delete your account? This action cannot be undone.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && _userId != null) {
+      try {
+        // TODO: Delete user's data from Firestore (e.g., reports, medical files) before deleting the user account.
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_userId)
+            .delete();
+        await FirebaseAuth.instance.currentUser?.delete();
+
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (route) => false);
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Error: ${e.message}. Please sign in again to delete your account.')),
+        );
       }
     }
-    return combinedData;
   }
 
   @override
@@ -43,27 +87,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        title: Text("profile_title".tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              // TODO: Navigate to an "Edit Profile" screen
-            },
-            tooltip: 'Edit Profile',
-          ),
-        ],
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _getCombinedUserData(),
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: _getUserData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError || !snapshot.hasData) {
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
             return Center(
                 child: Text('Failed to load profile: ${snapshot.error}'));
           }
@@ -71,7 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final data = snapshot.data!;
 
           return Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: Column(
               children: [
                 // Profile Header Card
@@ -82,10 +119,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                      )
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 8)
                     ],
                   ),
                   child: Column(
@@ -97,31 +133,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Icon(Icons.person, size: 40, color: Colors.white),
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        data['name'] ?? 'N/A',
-                        style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
+                      Text(data['name'] ?? 'N/A',
+                          style: const TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text(
-                        (data['userType'] as String?)
-                                ?.replaceAll('_', ' ')
-                                .toUpperCase() ??
-                            'INDIVIDUAL',
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
+                      Text(_translateUserType(data['userType']),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.grey)),
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
-                // Details Section
-                _buildDetailRow(
-                    "Date of Birth:", "May 15, 1994"), // Placeholder
-                _buildDetailRow(
-                    "Medical Condition:", data['chronicDiseases'] ?? 'None'),
-                _buildDetailRow("Allergies:", data['allergies'] ?? 'None'),
-                _buildDetailRow("Blood Type:", data['bloodType'] ?? 'N/A'),
+                const SizedBox(height: 24),
+                // Buttons Section
+                _buildActionButton(
+                  text: 'Medical ID',
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/medical_file'),
+                  color: const Color(0xFF0A2342),
+                ),
+                const SizedBox(height: 16),
+                InkWell(
+                  onTap: _launchURL,
+                  child: const Text(
+                    'مركز طب الطوارئ والدعم',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
+                const Spacer(), // Pushes the bottom buttons down
+                _buildActionButton(
+                  text: 'Edit Profile',
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/edit_profile'),
+                  color: Colors.green.shade700,
+                ),
+                const SizedBox(height: 16),
+                _buildActionButton(
+                  text: 'Delete Account',
+                  onPressed: _deleteAccount,
+                  color: Colors.red.shade700,
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           );
@@ -130,29 +183,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper widget to create the classic detail row
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
+  Widget _buildActionButton(
+      {required String text,
+      required VoidCallback onPressed,
+      required Color color}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: Text(text,
             style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF0A2342),
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
-        ],
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16)),
       ),
     );
   }

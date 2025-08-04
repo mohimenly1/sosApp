@@ -64,6 +64,13 @@ class RescueHomeScreen extends StatelessWidget {
               label: 'Chat Box',
               onTap: () => Navigator.pushNamed(context, '/chat_list'),
             ),
+            HomeGridButton(
+              icon: Icons.cloud_outlined,
+              label: 'Weather',
+              onTap: () {
+                Navigator.pushNamed(context, '/weather');
+              },
+            ),
           ],
         ),
       ),
