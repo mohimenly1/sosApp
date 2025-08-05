@@ -50,20 +50,20 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'lib/assets/logo.jpeg', // Make sure you have this asset
+              'lib/assets/Untitled.gif', // Make sure you have this asset
               width: 180,
               height: 180,
             ),
-            const SizedBox(height: 32),
-            const Text(
-              'ResQTrack',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0A2342),
-                letterSpacing: 1.2,
-              ),
-            ),
+            // const SizedBox(height: 32),
+            // const Text(
+            //   'ResQTrack',
+            //   style: TextStyle(
+            //     fontSize: 32,
+            //     fontWeight: FontWeight.bold,
+            //     color: Color(0xFF0A2342),
+            //     letterSpacing: 1.2,
+            //   ),
+            // ),
             const SizedBox(height: 20),
             const CircularProgressIndicator(
               color: Color(0xFF0A2342),
