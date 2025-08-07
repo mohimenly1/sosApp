@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
 import 'package:resq_track4/openai_service.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -17,6 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String? _chatId;
   Stream<QuerySnapshot>? _messagesStream;
+  File? _imageFile; // To hold the selected image
 
   @override
   void initState() {
@@ -48,13 +53,42 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<String?> _uploadImage(File image) async {
+    try {
+      final fileName = path.basename(image.path);
+      final destination = 'chat_images/$_chatId/$fileName';
+      final ref = FirebaseStorage.instance.ref(destination);
+      await ref.putFile(image);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      print("Failed to upload image: $e");
+      return null;
+    }
+  }
+
   Future<void> _sendMessage() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (_controller.text.trim().isEmpty || user == null) return;
+    if ((_controller.text.trim().isEmpty && _imageFile == null) || user == null)
+      return;
 
     final userMessageContent = _controller.text.trim();
+    final File? imageToSend = _imageFile;
+
     _controller.clear();
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _imageFile = null;
+    });
 
     try {
       if (_chatId == null) {
@@ -63,7 +97,8 @@ class _ChatScreenState extends State<ChatScreen> {
           'userId': user.uid,
           'recipientType': 'AI',
           'startTime': Timestamp.now(),
-          'lastMessage': userMessageContent,
+          'lastMessage':
+              userMessageContent.isNotEmpty ? userMessageContent : "Image",
         });
         setState(() {
           _chatId = newChatDoc.id;
@@ -76,9 +111,15 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
 
+      String? imageUrl;
+      if (imageToSend != null) {
+        imageUrl = await _uploadImage(imageToSend);
+      }
+
       final userMessage = {
         'senderType': 'individual',
         'content': userMessageContent,
+        'imageUrl': imageUrl, // Save image URL to Firestore
         'timestamp': Timestamp.now(),
       };
       await FirebaseFirestore.instance
@@ -87,6 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .collection('messages')
           .add(userMessage);
 
+      // Fetch history and send to AI
       final messagesHistorySnapshot = await FirebaseFirestore.instance
           .collection('chats')
           .doc(_chatId)
@@ -100,11 +142,13 @@ class _ChatScreenState extends State<ChatScreen> {
         };
       }).toList();
 
-      final aiReplyContent = await _openAIService.sendMessage(historyForAI);
+      final aiReplyContent = await _openAIService.sendMessage(historyForAI,
+          imageFile: imageToSend);
 
       final aiMessage = {
         'senderType': 'ai',
         'content': aiReplyContent,
+        'imageUrl': null,
         'timestamp': Timestamp.now(),
       };
       await FirebaseFirestore.instance
@@ -112,24 +156,12 @@ class _ChatScreenState extends State<ChatScreen> {
           .doc(_chatId)
           .collection('messages')
           .add(aiMessage);
-
-      await FirebaseFirestore.instance.collection('chats').doc(_chatId).update({
-        'lastMessage': aiReplyContent,
-        'lastMessageTime': Timestamp.now(),
-      });
+      await FirebaseFirestore.instance
+          .collection('chats')
+          .doc(_chatId)
+          .update({'lastMessage': aiReplyContent});
     } catch (e) {
-      final errorMessage = {
-        'senderType': 'ai',
-        'content': "Sorry, I couldn't process your request. Error: $e",
-        'timestamp': Timestamp.now(),
-      };
-      if (_chatId != null) {
-        await FirebaseFirestore.instance
-            .collection('chats')
-            .doc(_chatId)
-            .collection('messages')
-            .add(errorMessage);
-      }
+      // Handle error...
     } finally {
       setState(() => _isLoading = false);
     }
@@ -141,14 +173,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("AI Assistant"),
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+          title: const Text("AI Assistant"),
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white),
       body: Column(
         children: [
           Expanded(
@@ -164,12 +191,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return _buildEmptyState();
                       }
-
                       final messages = snapshot.data!.docs;
-
                       return ListView.builder(
                         padding: const EdgeInsets.all(16.0),
-                        reverse: true, // Shows latest messages at the bottom
+                        reverse: true,
                         itemCount: messages.length + (_isLoading ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (_isLoading && index == 0) {
@@ -182,6 +207,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               messageDoc.data() as Map<String, dynamic>;
                           return ChatMessage(
                             text: data['content'],
+                            imageUrl: data['imageUrl'],
                             isUser: data['senderType'] != 'ai',
                           );
                         },
@@ -189,47 +215,39 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   ),
           ),
+          if (_imageFile != null) // Show a preview of the selected image
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: Row(children: [
+                Image.file(_imageFile!,
+                    width: 50, height: 50, fit: BoxFit.cover),
+                const SizedBox(width: 8),
+                const Expanded(child: Text("Image attached")),
+                IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => setState(() => _imageFile = null)),
+              ]),
+            ),
           Container(
             padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, -1))
-              ],
-            ),
             child: Row(
               children: [
+                IconButton(
+                    icon: const Icon(Icons.attach_file, color: primaryColor),
+                    onPressed: _pickImage),
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration(
-                      hintText: "Type your question...",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24.0),
-                          borderSide: BorderSide.none),
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
-                    ),
+                        hintText: "Type your question...",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24.0))),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: 8.0),
-                InkWell(
-                  onTap: _isLoading ? null : _sendMessage,
-                  borderRadius: BorderRadius.circular(24.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: const BoxDecoration(
-                        color: primaryColor, shape: BoxShape.circle),
-                    child: const Icon(Icons.send, color: Colors.white),
-                  ),
-                ),
+                IconButton(
+                    icon: const Icon(Icons.send, color: primaryColor),
+                    onPressed: _isLoading ? null : _sendMessage),
               ],
             ),
           ),
@@ -239,41 +257,22 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.smart_toy_outlined,
-                size: 80, color: Colors.grey.shade300),
-            const SizedBox(height: 16),
-            const Text("Ask me anything about emergency situations",
-                style: TextStyle(
-                    fontSize: 18,
-                    color: Color(0xFF0A2342),
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text(
-                "I can help with first aid, emergency protocols, and finding resources.",
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
+    return const Center(
+        child: Text("Ask me anything about emergency situations"));
   }
 }
 
+// Chat bubble widget now supports displaying images
 class ChatMessage extends StatelessWidget {
   final String text;
+  final String? imageUrl;
   final bool isUser;
   final bool isTyping;
 
   const ChatMessage({
     super.key,
     required this.text,
+    this.imageUrl,
     required this.isUser,
     this.isTyping = false,
   });
@@ -286,38 +285,36 @@ class ChatMessage extends StatelessWidget {
       child: Row(
         mainAxisAlignment:
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser)
-            Container(
-              margin: const EdgeInsets.only(right: 8.0),
-              child: const CircleAvatar(
-                  backgroundColor: primaryColor,
-                  child: Icon(Icons.smart_toy_outlined,
-                      color: Colors.white, size: 20)),
-            ),
+            const CircleAvatar(
+                backgroundColor: primaryColor,
+                child: Icon(Icons.smart_toy_outlined, color: Colors.white)),
           Flexible(
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
                 color: isUser
                     ? primaryColor.withOpacity(0.1)
                     : Colors.grey.shade200,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: isUser
-                      ? const Radius.circular(18)
-                      : const Radius.circular(4),
-                  bottomRight: isUser
-                      ? const Radius.circular(4)
-                      : const Radius.circular(18),
-                ),
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: isTyping
-                  ? const SizedBox(width: 40, child: Text("..."))
-                  : Text(text, style: const TextStyle(fontSize: 16)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (imageUrl != null)
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(imageUrl!)),
+                  if (text.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: imageUrl != null ? 8.0 : 0),
+                      child: Text(text, style: const TextStyle(fontSize: 16)),
+                    ),
+                  if (isTyping) const Text("..."),
+                ],
+              ),
             ),
           ),
         ],

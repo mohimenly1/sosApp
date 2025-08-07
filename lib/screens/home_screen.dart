@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   HomeGridButton(
                     icon: Icons.smart_toy_outlined,
-                    label: 'Chatbot',
+                    label: 'AI Assistant',
                     onTap: () => Navigator.pushNamed(context, '/chat'),
                   ),
                   HomeGridButton(
