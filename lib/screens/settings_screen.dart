@@ -88,12 +88,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               onTap: () {},
             ),
-            const SizedBox(height: 16),
-            _buildSettingsOption(
-              icon: Icons.privacy_tip_outlined,
-              title: "privacy_policy".tr(),
-              onTap: () {/* TODO: Navigate to Privacy Policy */},
-            ),
+            // const SizedBox(height: 16),
+            // _buildSettingsOption(
+            //   icon: Icons.privacy_tip_outlined,
+            //   title: "privacy_policy".tr(),
+            //   onTap: () {/* TODO: Navigate to Privacy Policy */},
+            // ),
             const SizedBox(height: 16),
             _buildSettingsOption(
               icon: Icons.logout,

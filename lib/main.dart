@@ -3,15 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import FCM
 import 'package:resq_track4/screens/all_alerts_screen.dart';
+import 'package:resq_track4/screens/all_news_screen.dart';
 import 'package:resq_track4/screens/chat/user_chat_list_screen.dart';
 import 'package:resq_track4/screens/edit_profile_screen.dart';
 import 'package:resq_track4/screens/forgot_password_screen.dart';
 import 'package:resq_track4/screens/profile_screen.dart';
 import 'package:resq_track4/screens/rescue_home_screen.dart';
 import 'package:resq_track4/screens/rescue_team/active_reports_screen.dart';
+import 'package:resq_track4/screens/rescue_team/add_shelter_screen.dart';
 import 'package:resq_track4/screens/rescue_team/chat_list_screen.dart';
 import 'package:resq_track4/screens/safe_routes_screen.dart';
 import 'package:resq_track4/screens/send_report_screen.dart';
+import 'package:resq_track4/screens/shelters_map_screen.dart';
 import 'package:resq_track4/screens/user_map_screen.dart';
 import 'package:resq_track4/screens/weather_screen.dart';
 import 'firebase_options.dart';
@@ -127,6 +130,9 @@ class MyApp extends StatelessWidget {
         '/send_report': (context) => const SendReportScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
         '/weather': (context) => const WeatherScreen(),
+        '/all_news': (context) => const AllNewsScreen(),
+        '/add_shelter': (context) => const AddShelterScreen(),
+        '/shelters_map': (context) => const SheltersMapScreen(),
       },
     );
   }

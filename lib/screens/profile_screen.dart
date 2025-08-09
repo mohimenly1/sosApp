@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:url_launcher/url_launcher.dart'; // For opening links
+import 'package:url_launcher/url_launcher.dart'; // For opening links and making calls
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,10 +34,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _launchURL() async {
-    final Uri url = Uri.parse('https://emsc.gov.ly/');
+  // MODIFIED: This function now makes a phone call
+  Future<void> _makeEmergencyCall() async {
+    final Uri url = Uri.parse('tel:1412');
     if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
+      // Show an error if the call could not be made
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not make a call to $url')),
+      );
     }
   }
 
@@ -152,10 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: const Color(0xFF0A2342),
                 ),
                 const SizedBox(height: 16),
+                // MODIFIED: This now makes a phone call instead of opening a URL
                 InkWell(
-                  onTap: _launchURL,
+                  onTap: _makeEmergencyCall,
                   child: const Text(
-                    'مركز طب الطوارئ والدعم',
+                    'مركز طب الطوارئ والدعم (1412)',
                     style: TextStyle(
                         color: Colors.blue,
                         decoration: TextDecoration.underline),

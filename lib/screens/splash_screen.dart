@@ -14,22 +14,21 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Wait for 3 seconds before requesting permissions and navigating
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 4), () {
+      // Increased duration slightly
       _requestPermissionsAndNavigate();
     });
   }
 
   Future<void> _requestPermissionsAndNavigate() async {
-    // UPDATED: A comprehensive list of all permissions needed for the app.
-    // This ensures all features like maps, camera, and notifications work correctly.
+    // A comprehensive list of all permissions needed for the app.
     await [
-      Permission.location, // For all map and location features.
-      Permission.notification, // To receive emergency alerts.
-      Permission.camera, // To take photos for reports.
-      Permission.microphone, // For voice notes in reports.
-      Permission.storage, // For accessing files on older Android versions.
-      Permission
-          .photos, // For accessing the photo gallery on newer Android/iOS.
+      Permission.location,
+      Permission.notification,
+      Permission.camera,
+      Permission.microphone,
+      Permission.storage,
+      Permission.photos,
     ].request();
 
     if (mounted) {
@@ -46,29 +45,43 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'lib/assets/Untitled.gif', // Make sure you have this asset
-              width: 180,
-              height: 180,
-            ),
-            // const SizedBox(height: 32),
-            // const Text(
-            //   'ResQTrack',
-            //   style: TextStyle(
-            //     fontSize: 32,
-            //     fontWeight: FontWeight.bold,
-            //     color: Color(0xFF0A2342),
-            //     letterSpacing: 1.2,
-            //   ),
-            // ),
-            const SizedBox(height: 20),
-            const CircularProgressIndicator(
-              color: Color(0xFF0A2342),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/assets/logo.jpeg', // Make sure you have this asset
+                width: 180,
+                height: 180,
+              ),
+              const SizedBox(height: 32),
+              // NEW: Added the welcome text
+              const Text(
+                'مرحبًا بك في ResQTrack',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0A2342),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // NEW: Added the descriptive text
+              Text(
+                'نحن هنا لنساعدك في حالات الطوارئ وتتبع فرق الإنقاذ بدقة وسرعة.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              const CircularProgressIndicator(
+                color: Color(0xFF0A2342),
+              ),
+            ],
+          ),
         ),
       ),
     );
