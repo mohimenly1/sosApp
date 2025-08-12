@@ -142,8 +142,8 @@ class _ChatScreenState extends State<ChatScreen> {
         };
       }).toList();
 
-      final aiReplyContent = await _openAIService.sendMessage(historyForAI,
-          imageFile: imageToSend);
+      final aiReplyContent =
+          await _openAIService.sendMessage(historyForAI, imageUrl: imageUrl);
 
       final aiMessage = {
         'senderType': 'ai',

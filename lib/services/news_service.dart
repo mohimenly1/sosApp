@@ -27,10 +27,11 @@ class NewsArticle {
 class NewsService {
   static const String _apiKey = 'd05598891998454a875b92ccf1c1e63b';
 
-  static const String _baseUrl = 'https://newsapi.org/v2/everything';
+  static const String _baseUrl =
+      'https://newsapi.org/v2/top-headlines?country=ly';
 
   Future<List<NewsArticle>> fetchNews() async {
-    final url = '$_baseUrl?q=tripoli?&apiKey=$_apiKey';
+    final url = '$_baseUrl?country=ly&apiKey=$_apiKey';
 
     try {
       final response = await http.get(Uri.parse(url));
