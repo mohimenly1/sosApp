@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class HomeGridButton extends StatelessWidget {
   final IconData icon;
@@ -37,7 +38,7 @@ class HomeGridButton extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF0A2342),
               ),
-            ),
+            ).tr(),
           ],
         ),
       ),

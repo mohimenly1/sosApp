@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'safe_route_details_screen.dart'; // We will create this next
+import 'package:easy_localization/easy_localization.dart';
 
 class SafeRoutesScreen extends StatelessWidget {
   const SafeRoutesScreen({super.key});
@@ -13,7 +14,7 @@ class SafeRoutesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Safe Routes'),
+        title: Text(tr('Your Safe Routes')),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -26,11 +27,11 @@ class SafeRoutesScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'No safe routes have been shared with you yet.',
+                tr('No safe routes have been shared with you yet.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             );
           }
@@ -74,23 +75,23 @@ class RouteInfoCard extends StatelessWidget {
           .get(),
       builder: (context, routeSnapshot) {
         if (!routeSnapshot.hasData) {
-          return const Card(child: ListTile(title: Text('Loading route...')));
+          return Card(child: ListTile(title: Text(tr('Loading route...'))));
         }
         if (!routeSnapshot.data!.exists) {
-          return const Card(
-              child: ListTile(title: Text('Route data is missing.')));
+          return Card(
+              child: ListTile(title: Text(tr('Route data is missing.'))));
         }
 
-        final routeData = routeSnapshot.data!.data() as Map<String, dynamic>;
+        // final routeData = routeSnapshot.data!.data() as Map<String, dynamic>; // لم يتم استخدامه
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
             leading: const Icon(Icons.shield_outlined,
                 color: Colors.green, size: 40),
-            title: const Text('Safe Route Assigned',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Shared on: $formattedDate'),
+            title: Text(tr('Safe Route Assigned'),
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(tr('Shared on: $formattedDate')),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.push(

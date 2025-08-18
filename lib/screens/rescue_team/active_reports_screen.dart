@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'report_details_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ActiveReportsScreen extends StatelessWidget {
   const ActiveReportsScreen({super.key});
@@ -10,7 +11,7 @@ class ActiveReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Active Distress Signals'),
+        title: Text(tr('Active Distress Signals')),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -23,10 +24,10 @@ class ActiveReportsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'No active distress signals at the moment.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                tr('No active distress signals at the moment.'),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             );
           }
@@ -40,8 +41,8 @@ class ActiveReportsScreen extends StatelessWidget {
 
               final dataObject = report.data();
               if (dataObject is! Map<String, dynamic>) {
-                return const Card(
-                    child: ListTile(title: Text('Invalid report format.')));
+                return Card(
+                    child: ListTile(title: Text(tr('Invalid report format.'))));
               }
               final data = dataObject;
 
@@ -56,7 +57,7 @@ class ActiveReportsScreen extends StatelessWidget {
                   leading: const Icon(Icons.sos, color: Colors.red, size: 40),
                   title: UserInfoWidget(userId: data['userId'] ?? ''),
                   subtitle: Text(
-                    '${data['content'] ?? 'No description.'}\nReported at: $formattedDate',
+                    tr('${data['content'] ?? 'No description.'}\nReported at: $formattedDate'),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -87,8 +88,8 @@ class UserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (userId.isEmpty) {
-      return const Text('Unknown User',
-          style: TextStyle(fontWeight: FontWeight.bold));
+      return Text(tr('Unknown User'),
+          style: const TextStyle(fontWeight: FontWeight.bold));
     }
 
     return FutureBuilder<DocumentSnapshot>(
@@ -97,19 +98,19 @@ class UserInfoWidget extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData && snapshot.data!.exists) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
-            return Text(userData['name'] ?? 'Unknown User',
+            return Text(tr(userData['name'] ?? 'Unknown User'),
                 style: const TextStyle(fontWeight: FontWeight.bold));
           } else {
-            return const Text('Deleted User',
-                style: TextStyle(
+            return Text(tr('Deleted User'),
+                style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.red,
                     fontStyle: FontStyle.italic));
           }
         }
 
-        return const Text('Loading user...',
-            style: TextStyle(fontStyle: FontStyle.italic));
+        return Text(tr('Loading user...'),
+            style: const TextStyle(fontStyle: FontStyle.italic));
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SafeRouteDetailsScreen extends StatelessWidget {
   final String routeId;
@@ -11,7 +12,7 @@ class SafeRouteDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Safe Evacuation Route'),
+        title: Text(tr('Safe Evacuation Route')),
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
@@ -23,8 +24,8 @@ class SafeRouteDetailsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(
-                child: Text('Route details could not be loaded.'));
+            return Center(
+                child: Text(tr('Route details could not be loaded.')));
           }
 
           final routeData = snapshot.data!.data() as Map<String, dynamic>;
@@ -58,18 +59,19 @@ class SafeRouteDetailsScreen extends StatelessWidget {
                     point: startPoint,
                     width: 100,
                     height: 80,
-                    child: const Column(children: [
-                      Icon(Icons.location_on, color: Colors.blue, size: 40),
-                      Text('Start Here')
+                    child: Column(children: [
+                      const Icon(Icons.location_on,
+                          color: Colors.blue, size: 40),
+                      Text(tr('Start Here'))
                     ]),
                   ),
                   Marker(
                     point: endPoint,
                     width: 100,
                     height: 80,
-                    child: const Column(children: [
-                      Icon(Icons.shield, color: Colors.green, size: 40),
-                      Text('Safe Shelter')
+                    child: Column(children: [
+                      const Icon(Icons.shield, color: Colors.green, size: 40),
+                      Text(tr('Safe Shelter'))
                     ]),
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -25,8 +26,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       // Show a success message and pop the screen
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password reset link has been sent to your email.'),
+        SnackBar(
+          content: Text(tr('Password reset link has been sent to your email.')),
           backgroundColor: Colors.green,
         ),
       );
@@ -39,11 +40,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         message = 'No user found for that email.';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
+        SnackBar(content: Text(tr(message)), backgroundColor: Colors.red),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: $e')),
+        SnackBar(content: Text(tr('An unexpected error occurred: $e'))),
       );
     } finally {
       if (mounted) {
@@ -56,7 +57,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reset Password'),
+        title: Text(tr('Reset Password')),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -68,19 +69,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 40),
               const Icon(Icons.lock_reset, size: 80, color: Color(0xFF0A2342)),
               const SizedBox(height: 24),
-              const Text(
-                'Forgot Your Password?',
+              Text(
+                tr('Forgot Your Password?'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF0A2342)),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Enter the email address associated with your account and we\'ll send you a link to reset your password.',
+              Text(
+                tr('Enter the email address associated with your account and we\'ll send you a link to reset your password.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 32),
               TextFormField(
@@ -103,8 +104,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Send Reset Link',
-                        style: TextStyle(
+                    : Text(tr('Send Reset Link'),
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/database_helper.dart'; // Import the database helper
+import 'package:easy_localization/easy_localization.dart';
 
 class MedicalFileScreen extends StatefulWidget {
   const MedicalFileScreen({super.key});
@@ -39,7 +40,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
       setState(() => _isLoading = false);
       return;
     }
-    final localData = await _dbHelper.getMedicalFileByOwnerId(_currentUserId!);
+    final localData = await _dbHelper.getMedicalFileByOwnerId(_currentUserId);
     if (mounted && localData != null) {
       setState(() {
         _medicalFileId = localData['id'];
@@ -136,14 +137,14 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
       await _dbHelper.insertMedicalFile(fileForDb as Map<String, dynamic>);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Medical file saved successfully!'),
+        SnackBar(
+            content: Text(tr('Medical file saved successfully!')),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save data: $e')),
+        SnackBar(content: Text(tr('Failed to save data: $e'))),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -154,7 +155,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Medical File"),
+        title: Text(tr("Medical File")),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -172,7 +173,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
                       "Your medical information is crucial in an emergency. Please keep it updated.",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey),
-                    ),
+                    ).tr(),
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _bloodTypeController,
@@ -207,9 +208,10 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: const Text("Save Information",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold))
+                          .tr(),
                     )
                   ],
                 ),

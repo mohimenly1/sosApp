@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../services/database_helper.dart'; // 1. Import our database helper
+import 'package:easy_localization/easy_localization.dart';
 
 class AllAlertsScreen extends StatefulWidget {
   const AllAlertsScreen({super.key});
@@ -93,14 +94,15 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Emergency Alerts'),
+        title: const Text('All Emergency Alerts').tr(),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _alerts.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text('No alerts have been issued yet.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey)),
+                          style: TextStyle(fontSize: 16, color: Colors.grey))
+                      .tr(),
                 )
               : RefreshIndicator(
                   onRefresh:
@@ -131,13 +133,14 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
                             ),
                           ),
                           title: Text(alert['title'],
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold))
+                              .tr(),
                           subtitle: Text(
                             '${alert['description']}\nIssued: $formattedDate',
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
-                          ),
+                          ).tr(),
                           isThreeLine: true,
                         ),
                       );

@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:resq_track4/openai_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -142,8 +143,8 @@ class _ChatScreenState extends State<ChatScreen> {
         };
       }).toList();
 
-      final aiReplyContent =
-          await _openAIService.sendMessage(historyForAI, imageUrl: imageUrl);
+      final aiReplyContent = await _openAIService.sendMessage(historyForAI,
+          imageFile: imageToSend);
 
       final aiMessage = {
         'senderType': 'ai',
@@ -173,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-          title: const Text("AI Assistant"),
+          title: Text("AI Assistant").tr(),
           backgroundColor: primaryColor,
           foregroundColor: Colors.white),
       body: Column(
@@ -222,7 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Image.file(_imageFile!,
                     width: 50, height: 50, fit: BoxFit.cover),
                 const SizedBox(width: 8),
-                const Expanded(child: Text("Image attached")),
+                Expanded(child: Text("Image attached").tr()),
                 IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => setState(() => _imageFile = null)),
@@ -257,8 +258,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildEmptyState() {
-    return const Center(
-        child: Text("Ask me anything about emergency situations"));
+    return Center(
+        child: Text("Ask me anything about emergency situations").tr());
   }
 }
 
@@ -310,9 +311,10 @@ class ChatMessage extends StatelessWidget {
                   if (text.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(top: imageUrl != null ? 8.0 : 0),
-                      child: Text(text, style: const TextStyle(fontSize: 16)),
+                      child:
+                          Text(text, style: const TextStyle(fontSize: 16)).tr(),
                     ),
-                  if (isTyping) const Text("..."),
+                  if (isTyping) Text("...").tr(),
                 ],
               ),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AddShelterScreen extends StatefulWidget {
   const AddShelterScreen({super.key});
@@ -88,7 +89,7 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
       _loadExistingShelters();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add shelter: $e')),
+        SnackBar(content: Text(tr('Failed to add shelter: $e'))),
       );
     }
   }
@@ -96,7 +97,7 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Shelters')),
+      appBar: AppBar(title: const Text('Add Shelters').tr()),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : GoogleMap(
@@ -131,7 +132,7 @@ class _AddShelterDialogState extends State<_AddShelterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Shelter Details'),
+      title: const Text('Add Shelter Details').tr(),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -143,7 +144,8 @@ class _AddShelterDialogState extends State<_AddShelterDialog> {
           DropdownButtonFormField<String>(
             value: _selectedType,
             items: _shelterTypes
-                .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                .map((type) =>
+                    DropdownMenuItem(value: type, child: Text(type).tr()))
                 .toList(),
             onChanged: (value) {
               if (value != null) setState(() => _selectedType = value);
@@ -155,7 +157,7 @@ class _AddShelterDialogState extends State<_AddShelterDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel')),
+            child: const Text('Cancel').tr()),
         ElevatedButton(
           onPressed: () {
             if (_nameController.text.isNotEmpty) {
@@ -163,7 +165,7 @@ class _AddShelterDialogState extends State<_AddShelterDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('Save'),
+          child: const Text('Save').tr(),
         ),
       ],
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -100,7 +101,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Safe Routes Map"),
+        title: const Text("Safe Routes Map").tr(),
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
       ),
@@ -180,14 +181,14 @@ class _MapScreenState extends State<MapScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ).tr(),
                     const SizedBox(height: 8), // Correct usage
                     const Text(
                       'Evacuation Center 1',
                       style: TextStyle(
                         fontSize: 16,
                       ),
-                    ),
+                    ).tr(),
                     const SizedBox(height: 4), // Correct usage
                     const Text(
                       'Distance: 0.5 km • ETA: 6 min',
@@ -195,7 +196,7 @@ class _MapScreenState extends State<MapScreen> {
                         fontSize: 14,
                         color: Colors.grey,
                       ),
-                    ),
+                    ).tr(),
                     const SizedBox(height: 16), // Correct usage
                     SizedBox(
                       width: double.infinity,
@@ -210,7 +211,7 @@ class _MapScreenState extends State<MapScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text('Navigate'),
+                        child: const Text('Navigate').tr(),
                       ),
                     ),
                   ],

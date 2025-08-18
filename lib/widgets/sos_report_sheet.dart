@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // 1. Import Google Maps
+import 'package:easy_localization/easy_localization.dart';
 
 class SosReportSheet extends StatefulWidget {
   final Position initialPosition;
@@ -82,15 +83,15 @@ class _SosReportSheetState extends State<SosReportSheet> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Distress signal sent successfully!'),
+        SnackBar(
+            content: Text(tr('Distress signal sent successfully!')),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop(); // Close the bottom sheet
       Navigator.of(context).pop(); // Go back from the SOS screen
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to send report: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send report: $e').tr()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -104,9 +105,10 @@ class _SosReportSheetState extends State<SosReportSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Center(
-              child: Text("Confirm Incident Location",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+          Center(
+              child: Text(tr("Confirm Incident Location"),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold))),
           const SizedBox(height: 16),
           Expanded(
             child: ClipRRect(
@@ -152,7 +154,8 @@ class _SosReportSheetState extends State<SosReportSheet> {
           if (_imageFile != null)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Text('Image attached: ${path.basename(_imageFile!.path)}',
+              child: Text(
+                  tr('Image attached: ${path.basename(_imageFile!.path)}'),
                   style: const TextStyle(color: Colors.green)),
             ),
           const SizedBox(height: 20),
@@ -166,8 +169,9 @@ class _SosReportSheetState extends State<SosReportSheet> {
               ),
               child: _isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Send Now',
-                      style: TextStyle(color: Colors.white, fontSize: 18)),
+                  : Text(tr('Send Now'),
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 18)),
             ),
           ),
         ],

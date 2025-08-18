@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../screens/sos_report_map_screen.dart'; // 1. Import the new full-screen page
+import 'package:easy_localization/easy_localization.dart';
 
 class SosConfirmationCard extends StatefulWidget {
   const SosConfirmationCard({super.key});
@@ -32,7 +33,7 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not get location: $e')),
+        SnackBar(content: Text('Could not get location: $e').tr()),
       );
     } finally {
       if (mounted) {
@@ -68,7 +69,7 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
               fontWeight: FontWeight.bold,
               color: Color(0xFF0A2342),
             ),
-          ),
+          ).tr(),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -86,7 +87,8 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
                 child: _isDeterminingLocation
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text('Yes',
-                        style: TextStyle(color: Colors.white, fontSize: 18)),
+                            style: TextStyle(color: Colors.white, fontSize: 18))
+                        .tr(),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -97,7 +99,8 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
                       borderRadius: BorderRadius.circular(12)),
                 ),
                 child: const Text('No',
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                        style: TextStyle(color: Colors.white, fontSize: 18))
+                    .tr(),
               ),
             ],
           ),

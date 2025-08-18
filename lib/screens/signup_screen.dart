@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -37,8 +38,8 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_formKey.currentState!.validate() || _selectedUserType == null) {
       if (_selectedUserType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a user type.'),
+          SnackBar(
+            content: Text(tr('Please select a user type.')),
             backgroundColor: Colors.red,
           ),
         );
@@ -91,12 +92,12 @@ class _SignupScreenState extends State<SignupScreen> {
         message = e.message ?? 'An unknown error occurred.';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
+        SnackBar(content: Text(message).tr(), backgroundColor: Colors.red),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('An unexpected error occurred: $e'),
+            content: Text('An unexpected error occurred: $e').tr(),
             backgroundColor: Colors.red),
       );
     } finally {
@@ -140,8 +141,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: Image.asset('lib/assets/Untitled.gif', height: 100),
                   ),
                   const SizedBox(height: 32),
-                  const Text('Create Account',
-                      style: TextStyle(
+                  Text(tr('Create Account'),
+                      style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF0A2342)),
@@ -149,35 +150,36 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Full Name'),
+                    decoration: InputDecoration(labelText: tr('Full Name')),
                     validator: (value) =>
-                        value!.isEmpty ? 'Enter your full name' : null,
+                        value!.isEmpty ? tr('Enter your full name') : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: InputDecoration(labelText: tr('Email')),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value!.isEmpty) return 'Enter an email';
-                      if (!value.contains('@')) return 'Enter a valid email';
+                      if (value!.isEmpty) return tr('Enter an email');
+                      if (!value.contains('@'))
+                        return tr('Enter a valid email');
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _phoneController,
-                    decoration: InputDecoration(labelText: 'Phone Number'),
+                    decoration: InputDecoration(labelText: tr('Phone Number')),
                     keyboardType: TextInputType.phone,
                     validator: (value) =>
-                        value!.isEmpty ? 'Enter phone number' : null,
+                        value!.isEmpty ? tr('Enter phone number') : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _isObscure,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: tr('Password'),
                       suffixIcon: IconButton(
                         icon: Icon(_isObscure
                             ? Icons.visibility_off
@@ -187,9 +189,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value!.isEmpty) return 'Enter a password';
+                      if (value!.isEmpty) return tr('Enter a password');
                       if (value.length < 6)
-                        return 'Password must be at least 6 characters';
+                        return tr('Password must be at least 6 characters');
                       return null;
                     },
                   ),
@@ -198,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: _confirmPasswordController,
                     obscureText: _isObscureConfirm,
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
+                      labelText: tr('Confirm Password'),
                       suffixIcon: IconButton(
                         icon: Icon(_isObscureConfirm
                             ? Icons.visibility_off
@@ -209,22 +211,19 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     validator: (value) {
                       if (value != _passwordController.text)
-                        return 'Passwords do not match';
+                        return tr('Passwords do not match');
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: _selectedUserType,
-                    decoration: InputDecoration(labelText: 'User Type'),
-                    items: const [
+                    decoration: InputDecoration(labelText: tr('User Type')),
+                    items: [
                       DropdownMenuItem(
-                          value: 'individual', child: Text('Individual')),
+                          value: 'individual', child: Text(tr('Individual'))),
                       DropdownMenuItem(
-                          value: 'rescue_team', child: Text('Rescue Team')),
-                      DropdownMenuItem(
-                          value: 'government_entity',
-                          child: Text('Government Entity')),
+                          value: 'rescue_team', child: Text(tr('Rescue Team'))),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -232,7 +231,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       });
                     },
                     validator: (value) =>
-                        value == null ? 'Please select a user type' : null,
+                        value == null ? tr('Please select a user type') : null,
                   ),
                   const SizedBox(height: 32),
                   ElevatedButton(
@@ -251,8 +250,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.white)))
-                        : const Text('Sign up',
-                            style: TextStyle(
+                        : Text(tr('Sign up'),
+                            style: const TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold)),
@@ -261,12 +260,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Already have an account?'),
+                      Text(tr('Already have an account?')),
                       TextButton(
                         onPressed: () =>
                             Navigator.pushReplacementNamed(context, '/login'),
-                        child: const Text('Sign in',
-                            style: TextStyle(
+                        child: Text(tr('Sign in'),
+                            style: const TextStyle(
                                 color: Color(0xFF0A2342),
                                 fontWeight: FontWeight.bold)),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/sos_confirmation_card.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SosScreen extends StatelessWidget {
   const SosScreen({super.key});
@@ -15,7 +16,7 @@ class SosScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Distress Signal'),
+        title: const Text('Distress Signal').tr(),
         centerTitle: true,
         actions: [
           IconButton(

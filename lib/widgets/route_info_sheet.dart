@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RouteInfoSheet extends StatelessWidget {
   final DocumentSnapshot routeDoc;
@@ -27,8 +28,8 @@ class RouteInfoSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Safe Route Details',
-              style: TextStyle(
+          Text(tr('Safe Route Details'),
+              style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF0A2342))),
@@ -38,21 +39,21 @@ class RouteInfoSheet extends StatelessWidget {
           _buildDetailRow(Icons.wifi_off, 'Offline Available',
               (routeData['isOfflineAvailable'] ?? false) ? 'Yes' : 'No'),
           const SizedBox(height: 16),
-          const Text('Managed By:',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Text(tr('Managed By:'),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.grey)),
           FutureBuilder<DocumentSnapshot?>(
             future: _getTeamForRoute(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const ListTile(
-                    leading: CircularProgressIndicator(),
-                    title: Text('Loading team info...'));
+                return ListTile(
+                    leading: const CircularProgressIndicator(),
+                    title: Text(tr('Loading team info...')));
               }
               if (!snapshot.hasData || snapshot.data == null) {
-                return const ListTile(
-                    leading: Icon(Icons.error),
-                    title: Text('Team information not found.'));
+                return ListTile(
+                    leading: const Icon(Icons.error),
+                    title: Text(tr('Team information not found.')));
               }
               final teamData = snapshot.data!.data() as Map<String, dynamic>;
               return Card(
@@ -60,9 +61,10 @@ class RouteInfoSheet extends StatelessWidget {
                 color: Colors.blue.shade50,
                 child: ListTile(
                   leading: const Icon(Icons.group, color: Color(0xFF0A2342)),
-                  title: Text(teamData['name'] ?? 'Unnamed Team',
+                  title: Text(tr(teamData['name'] ?? 'Unnamed Team'),
                       style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('${teamData['membersCount'] ?? 0} members'),
+                  subtitle:
+                      Text(tr('${teamData['membersCount'] ?? 0} members')),
                 ),
               );
             },
@@ -79,8 +81,9 @@ class RouteInfoSheet extends StatelessWidget {
         children: [
           Icon(icon, color: Colors.grey[600]),
           const SizedBox(width: 16),
-          Text('$title: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Flexible(child: Text(value)),
+          Text(tr('$title: '),
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(child: Text(tr(value))),
         ],
       ),
     );

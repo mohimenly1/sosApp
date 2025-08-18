@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SendAlertScreen extends StatefulWidget {
   const SendAlertScreen({super.key});
@@ -32,8 +33,9 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_affectedLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select the affected location on the map.')),
+        SnackBar(
+            content:
+                Text(tr('Please select the affected location on the map.'))),
       );
       return;
     }
@@ -54,14 +56,14 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Alert sent successfully!'),
+        SnackBar(
+            content: Text(tr('Alert sent successfully!')),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send alert: $e')),
+        SnackBar(content: Text(tr('Failed to send alert: $e'))),
       );
     } finally {
       if (mounted) {
@@ -73,7 +75,7 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Send Emergency Alert')),
+      appBar: AppBar(title: const Text('Send Emergency Alert').tr()),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -101,7 +103,7 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
                 decoration: const InputDecoration(labelText: 'Disaster Type'),
                 items: _disasterTypes.map((String type) {
                   return DropdownMenuItem<String>(
-                      value: type, child: Text(type));
+                      value: type, child: Text(type).tr());
                 }).toList(),
                 onChanged: (newValue) {
                   setState(() => _selectedDisasterType = newValue);
@@ -111,7 +113,9 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
               ),
               const SizedBox(height: 24),
               const Text('Pinpoint Affected Location',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                  .tr(),
               const SizedBox(height: 8),
               SizedBox(
                 height: 300,
@@ -151,8 +155,10 @@ class _SendAlertScreenState extends State<SendAlertScreen> {
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text('Send Alert Now',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))
+                        .tr(),
               ),
             ],
           ),

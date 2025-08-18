@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SheltersMapScreen extends StatefulWidget {
   const SheltersMapScreen({super.key});
@@ -89,7 +90,7 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shelters & Medical Points')),
+      appBar: AppBar(title: const Text('Shelters & Medical Points').tr()),
       body: Stack(
         children: [
           _isLoading
@@ -116,7 +117,7 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: _filters.keys.map((type) {
                     return FilterChip(
-                      label: Text(type),
+                      label: Text(type).tr(),
                       selected: _filters[type]!,
                       onSelected: (bool selected) {
                         setState(() {

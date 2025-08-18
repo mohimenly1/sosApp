@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class P2PChatScreen extends StatefulWidget {
   final String recipientId;
@@ -68,7 +69,7 @@ class _P2PChatScreenState extends State<P2PChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.recipientName)),
+      appBar: AppBar(title: Text(tr(widget.recipientName))),
       body: Column(
         children: [
           Expanded(
@@ -79,7 +80,7 @@ class _P2PChatScreenState extends State<P2PChatScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('Start the conversation!'));
+                  return Center(child: Text(tr('Start the conversation!')));
                 }
 
                 final messages = snapshot.data!.docs;
@@ -112,7 +113,7 @@ class _P2PChatScreenState extends State<P2PChatScreen> {
           color: isMe ? const Color(0xFF0A2342) : Colors.grey[300],
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(text,
+        child: Text(tr(text),
             style: TextStyle(color: isMe ? Colors.white : Colors.black)),
       ),
     );

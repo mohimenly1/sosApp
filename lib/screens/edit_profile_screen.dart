@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -39,7 +40,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load profile data: $e')),
+        SnackBar(content: Text('Failed to load profile data: $e').tr()),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -56,14 +57,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'phone': _phoneController.text.trim(),
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Profile updated successfully!'),
+        SnackBar(
+            content: Text('Profile updated successfully!').tr(),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile: $e')),
+        SnackBar(content: Text('Failed to update profile: $e').tr()),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -73,7 +74,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: Text('Edit Profile').tr()),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -105,8 +106,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         backgroundColor: const Color(0xFF0A2342),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: const Text('Save Changes',
-                          style: TextStyle(color: Colors.white)),
+                      child: Text(tr('Save Changes'),
+                          style: const TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

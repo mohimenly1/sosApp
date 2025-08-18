@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MainScaffold extends StatefulWidget {
   final Widget body;
@@ -95,7 +96,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
-        ),
+        ).tr(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -166,7 +167,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                       fontSize: 10,
                     ),
                     textAlign: TextAlign.center,
-                  ),
+                  ).tr(),
                 ),
               ),
           ],

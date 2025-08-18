@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/news_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AllNewsScreen extends StatefulWidget {
   const AllNewsScreen({super.key});
@@ -29,7 +30,7 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Latest News'),
+        title: Text('Latest News').tr(),
       ),
       body: FutureBuilder<List<NewsArticle>>(
         future: _newsFuture,
@@ -38,10 +39,10 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}').tr());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No news found.'));
+            return Center(child: Text('No news found.').tr());
           }
 
           final articles = snapshot.data!;
@@ -77,11 +78,16 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(article.title,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16))
+                                .tr()
+                                .tr(),
                             const SizedBox(height: 8),
                             Text(article.description,
-                                maxLines: 3, overflow: TextOverflow.ellipsis),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis)
+                                .tr(),
                           ],
                         ),
                       ),

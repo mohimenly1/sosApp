@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AlertCardWidget extends StatelessWidget {
   final String title;
@@ -59,7 +60,7 @@ class AlertCardWidget extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.red.shade700),
-                ),
+                ).tr(),
               ],
             ),
           ),

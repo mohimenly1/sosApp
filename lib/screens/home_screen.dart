@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/home_grid_button.dart';
 import '../widgets/alert_card_widget.dart';
 import '../services/news_service.dart'; // 1. Import the news service
+import 'package:easy_localization/easy_localization.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         leading: const SizedBox.shrink(),
         centerTitle: false,
-        title: const Text("Dashboard"),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
@@ -98,15 +98,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/all_alerts');
                 },
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('See More Alerts',
-                        style: TextStyle(
+                    Text(tr('See More Alerts'),
+                        style: const TextStyle(
                             color: Color(0xFF555555),
                             fontWeight: FontWeight.bold)),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_ios,
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward_ios,
                         size: 14, color: Color(0xFF555555)),
                   ],
                 ),
@@ -177,22 +177,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(
+                errorBuilder: (context, error, stackTrace) => SizedBox(
                     height: 150,
-                    child: Center(child: Text("Image not available"))),
+                    child: Center(child: Text(tr("Image not available")))),
               ),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("TODAY'S NEWS",
+                  Text(tr("TODAY'S NEWS"),
                       style: TextStyle(
                           color: Colors.grey[600],
                           fontWeight: FontWeight.bold,
                           fontSize: 12)),
                   const SizedBox(height: 4),
-                  Text(article.title,
+                  Text(tr(article.title),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
                       maxLines: 2,
@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: TextButton(
                       onPressed: () =>
                           Navigator.pushNamed(context, '/all_news'),
-                      child: const Text("Read More..."),
+                      child: const Text("Read More...").tr(),
                     ),
                   )
                 ],
@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Center(
-          child: Text(title, style: const TextStyle(color: Colors.grey))),
+          child: Text(title, style: const TextStyle(color: Colors.grey)).tr()),
     );
   }
 }

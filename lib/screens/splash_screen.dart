@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../auth/auth_gate.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -65,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: Color(0xFF0A2342),
                 ),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
               const SizedBox(height: 16),
               // NEW: Added the descriptive text
               Text(
@@ -75,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: Colors.grey[600],
                 ),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
               const SizedBox(height: 40),
               const CircularProgressIndicator(
                 color: Color(0xFF0A2342),

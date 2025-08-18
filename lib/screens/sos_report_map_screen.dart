@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SosReportMapScreen extends StatefulWidget {
   final Position initialPosition;
@@ -80,14 +81,14 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Distress signal sent successfully!'),
+        SnackBar(
+            content: Text(tr('Distress signal sent successfully!')),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop(); // Go back from this screen
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to send report: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send report: $e').tr()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -96,7 +97,7 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirm Incident Location')),
+      appBar: AppBar(title: const Text('Confirm Incident Location').tr()),
       body: Stack(
         children: [
           // Full-screen Google Map
@@ -152,8 +153,9 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                            'Image attached: ${path.basename(_imageFile!.path)}',
-                            style: const TextStyle(color: Colors.green)),
+                                'Image attached: ${path.basename(_imageFile!.path)}',
+                                style: const TextStyle(color: Colors.green))
+                            .tr(),
                       ),
                     const SizedBox(height: 16),
                     SizedBox(
@@ -168,8 +170,9 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
                             : const Text('Send Now',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18)),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 18))
+                                .tr(),
                       ),
                     ),
                   ],

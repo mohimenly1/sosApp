@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/database_helper.dart'; // Import the database helper
 import 'team_details_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ManageTeamsScreen extends StatefulWidget {
   const ManageTeamsScreen({super.key});
@@ -94,16 +95,16 @@ class _ManageTeamsScreenState extends State<ManageTeamsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Rescue Teams'),
+        title: Text(tr('Manage Rescue Teams')),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _teams.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'No teams found.\nPress the "+" button to add a new team.',
+                    tr('No teams found.\nPress the "+" button to add a new team.'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
               : RefreshIndicator(
@@ -118,10 +119,10 @@ class _ManageTeamsScreenState extends State<ManageTeamsScreen> {
                         child: ListTile(
                           leading:
                               const Icon(Icons.group, color: Color(0xFF0A2342)),
-                          title: Text(team['name'],
+                          title: Text(tr(team['name']),
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text('${team['membersCount']} members'),
+                          subtitle: Text(tr('${team['membersCount']} members')),
                           trailing: const Icon(Icons.arrow_forward_ios),
                           onTap: () {
                             Navigator.push(

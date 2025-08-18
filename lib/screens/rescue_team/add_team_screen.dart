@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart'; // 1. Import Geolocator
+import 'package:easy_localization/easy_localization.dart';
 
 class AddTeamScreen extends StatefulWidget {
   const AddTeamScreen({super.key});
@@ -57,8 +58,9 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_startPoint == null || _endPoint == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select a start and end point on the map.')),
+        SnackBar(
+            content:
+                Text('Please select a start and end point on the map.').tr()),
       );
       return;
     }
@@ -90,14 +92,14 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Team and route created successfully!'),
+        SnackBar(
+            content: Text('Team and route created successfully!').tr(),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save data: $e')),
+        SnackBar(content: Text('Failed to save data: $e').tr()),
       );
     } finally {
       if (mounted) {
@@ -109,7 +111,7 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add New Team')),
+      appBar: AppBar(title: const Text('Add New Team').tr()),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -135,9 +137,12 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
               ),
               const SizedBox(height: 24),
               const Text('Define Evacuation Route',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const Text('Tap on the map to set Start (S) and End (E) points.',
-                  style: TextStyle(color: Colors.grey)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                  .tr(),
+              Text('Tap on the map to set Start (S) and End (E) points.',
+                      style: TextStyle(color: Colors.grey))
+                  .tr(),
               const SizedBox(height: 8),
               SizedBox(
                 height: 300,
@@ -210,7 +215,8 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
               const SizedBox(height: 16),
               SwitchListTile(
                 title: const Text('Make route available offline?',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
+                        style: TextStyle(fontWeight: FontWeight.w500))
+                    .tr(),
                 value: _isOfflineAvailable,
                 onChanged: (bool value) {
                   setState(() {
@@ -229,8 +235,10 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text('Save Team',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))
+                        .tr(),
               ),
             ],
           ),

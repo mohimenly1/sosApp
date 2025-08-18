@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'p2p_chat_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class UserChatListScreen extends StatefulWidget {
   const UserChatListScreen({super.key});
@@ -44,7 +45,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Contact Rescue Teams')),
+      appBar: AppBar(title: Text(tr('Contact Rescue Teams'))),
       body: FutureBuilder<List<DocumentSnapshot>>(
         future: _getAccessibleRescueTeams(),
         builder: (context, snapshot) {
@@ -52,14 +53,14 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text(tr('Error: ${snapshot.error}')));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'No rescue teams have shared a route with you yet.',
+                tr('No rescue teams have shared a route with you yet.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             );
           }
@@ -78,8 +79,8 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                     backgroundColor: Color(0xFF0A2442),
                     child: Icon(Icons.security_outlined, color: Colors.white),
                   ),
-                  title: Text(teamUser['name'] ?? 'Rescue Team'),
-                  subtitle: const Text('Tap to start a conversation'),
+                  title: Text(tr(teamUser['name'] ?? 'Rescue Team')),
+                  subtitle: Text(tr('Tap to start a conversation')),
                   onTap: () {
                     Navigator.push(
                       context,

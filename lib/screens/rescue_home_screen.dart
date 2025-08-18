@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resq_track4/widgets/home_grid_button.dart';
 import 'package:resq_track4/widgets/main_scaffold.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RescueHomeScreen extends StatelessWidget {
   const RescueHomeScreen({super.key});
@@ -10,7 +11,6 @@ class RescueHomeScreen extends StatelessWidget {
     return MainScaffold(
       body: Scaffold(
         appBar: AppBar(
-          title: const Text('Rescue Dashboard'),
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
@@ -77,7 +77,8 @@ class RescueHomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.add_location_alt_outlined,
                         color: Colors.white),
                     label: const Text('Add Shelters',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                            style: TextStyle(color: Colors.white, fontSize: 16))
+                        .tr(),
                     onPressed: () =>
                         Navigator.pushNamed(context, '/add_shelter'),
                     style: ElevatedButton.styleFrom(

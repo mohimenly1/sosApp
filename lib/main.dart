@@ -41,9 +41,9 @@ class GovHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MainScaffold(
       body: Scaffold(
-        appBar: AppBar(title: Text('Government Dashboard')),
-        body: const Center(child: Text('Welcome, Government Entity!')),
-      ),
+          // appBar: AppBar(title: Text('Government Dashboard') .tr()),
+          // body: Center(child: Text('Welcome, Government Entity!').tr()),
+          ),
     );
   }
 }

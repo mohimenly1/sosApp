@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../chat/p2p_chat_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -16,13 +17,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     if (_currentUserId == null) {
-      return const Scaffold(
-        body: Center(child: Text("Please log in to see your chats.")),
+      return Scaffold(
+        body: Center(child: Text(tr("Please log in to see your chats."))),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Conversations')),
+      appBar: AppBar(title: Text(tr('Conversations'))),
       body: StreamBuilder<QuerySnapshot>(
         // 1. Fetch all chats where the current user is a participant
         stream: FirebaseFirestore.instance
@@ -35,13 +36,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text(tr('Error: ${snapshot.error}')));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'No conversations yet.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                tr('No conversations yet.'),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             );
           }
@@ -87,7 +88,7 @@ class _ChatListItem extends StatelessWidget {
       builder: (context, userSnapshot) {
         if (!userSnapshot.hasData) {
           // Show a placeholder while loading user data
-          return const ListTile(title: Text("Loading chat..."));
+          return ListTile(title: Text(tr("Loading chat...")));
         }
 
         final userData = userSnapshot.data!.data() as Map<String, dynamic>?;
@@ -97,11 +98,11 @@ class _ChatListItem extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
             leading: const CircleAvatar(child: Icon(Icons.person)),
-            title: Text(recipientName,
+            title: Text(tr(recipientName),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             // 4. Display the last message
             subtitle: Text(
-              chatData['lastMessage'] ?? '',
+              tr(chatData['lastMessage'] ?? ''),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../services/database_helper.dart'; // Import the database helper
+import 'package:easy_localization/easy_localization.dart';
 
 class TeamDetailsScreen extends StatefulWidget {
   final String teamId;
@@ -45,7 +46,8 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Failed to load details from local storage: $e')),
+            content:
+                Text('Failed to load details from local storage: $e').tr()),
       );
     }
   }
@@ -54,12 +56,12 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_teamData?['name'] ?? 'Team Details'),
+        title: Text(_teamData?['name'] ?? 'Team Details').tr(),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _teamData == null || _routeData == null
-              ? const Center(child: Text('Could not load team data.'))
+              ? Center(child: Text(tr('Could not load team data.')))
               : _buildDetailsView(),
     );
   }
@@ -101,18 +103,20 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                       point: startPoint,
                       width: 80,
                       height: 80,
-                      child: const Column(children: [
-                        Icon(Icons.location_on, color: Colors.green, size: 40),
-                        Text('Start')
+                      child: Column(children: [
+                        const Icon(Icons.location_on,
+                            color: Colors.green, size: 40),
+                        Text(tr('Start'))
                       ]),
                     ),
                     Marker(
                       point: endPoint,
                       width: 80,
                       height: 80,
-                      child: const Column(children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 40),
-                        Text('End')
+                      child: Column(children: [
+                        const Icon(Icons.location_on,
+                            color: Colors.red, size: 40),
+                        Text(tr('End'))
                       ]),
                     ),
                   ],
@@ -129,9 +133,9 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                 _buildDetailRow(Icons.person_add, 'Member Count',
                     _teamData!['membersCount'].toString()),
                 const Divider(height: 32),
-                const Text('Route Information',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(tr('Route Information'),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 _buildDetailRow(Icons.security, 'Safety Level',
                     _routeData!['safetyLevel'].toString()),
@@ -153,8 +157,9 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
         children: [
           Icon(icon, color: Colors.grey[600]),
           const SizedBox(width: 16),
-          Text('$title: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Flexible(child: Text(value)),
+          Text(tr('$title: '),
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(child: Text(tr(value))),
         ],
       ),
     );

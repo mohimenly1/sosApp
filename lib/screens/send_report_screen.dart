@@ -11,6 +11,7 @@ import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SendReportScreen extends StatefulWidget {
   const SendReportScreen({super.key});
@@ -124,7 +125,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       } catch (e) {
         print("Error playing audio: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not play the audio file.')),
+          SnackBar(content: Text(tr('Could not play the audio file.'))),
         );
       }
     }
@@ -161,8 +162,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _sendReport() async {
     if (!_formKey.currentState!.validate()) return;
     if (_reportLocation == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Waiting for location...')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(tr('Waiting for location...'))));
       return;
     }
 
@@ -215,15 +216,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
       await FirebaseFirestore.instance.collection('reports').add(reportData);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Report sent successfully!'),
-            backgroundColor: Colors.green),
+        SnackBar(
+          content: Text(tr('Report sent successfully!')),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Failed to send report: ${e.toString().replaceFirst("Exception: ", "")}')));
+          content: Text(tr(
+              'Failed to send report: ${e.toString().replaceFirst("Exception: ", "")}'))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -235,7 +237,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Send Report'),
+        title: const Text('Send Report').tr(),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
@@ -318,18 +320,20 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Report Type',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold))
+                              .tr(),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             value: _selectedReportType,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12))),
-                            hint: const Text('Select a report type'),
+                            hint: const Text('Select a report type').tr(),
                             items: _reportTypes
                                 .map((type) => DropdownMenuItem(
-                                    value: type, child: Text(type)))
+                                    value: type, child: Text(type).tr()))
                                 .toList(),
                             onChanged: (value) =>
                                 setState(() => _selectedReportType = value),
@@ -355,8 +359,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
                           _buildVoiceRecorderUI(),
                           const SizedBox(height: 24),
                           const Text('Add Image',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold))
+                              .tr(),
                           const SizedBox(height: 8),
                           GestureDetector(
                             onTap: _pickImage,
@@ -378,8 +384,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(_statusMessage,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold))
+                              .tr(),
                           const SizedBox(height: 32),
                           SizedBox(
                             width: double.infinity,
@@ -396,10 +403,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
                                   ? const CircularProgressIndicator(
                                       color: Colors.white)
                                   : const Text('Send Report',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18)),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18))
+                                      .tr(),
                             ),
                           ),
                         ],
@@ -435,7 +443,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         color: Colors.blue.shade50,
         child: ListTile(
           leading: const Icon(Icons.audiotrack, color: Colors.blue),
-          title: const Text('Voice Note Ready'),
+          title: const Text('Voice Note Ready').tr(),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -455,8 +463,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     return ElevatedButton.icon(
       icon: const Icon(Icons.mic_none, color: Colors.white),
-      label: const Text('Record Voice Note',
-          style: TextStyle(color: Colors.white)),
+      label:
+          const Text('Record Voice Note', style: TextStyle(color: Colors.white))
+              .tr(),
       onPressed: _startRecording,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF0A2342),

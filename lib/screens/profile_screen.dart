@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:url_launcher/url_launcher.dart'; // For opening links and making calls
+import 'package:easy_localization/easy_localization.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -40,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!await launchUrl(url)) {
       // Show an error if the call could not be made
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not make a call to $url')),
+        SnackBar(content: Text('Could not make a call to $url').tr()),
       );
     }
   }
@@ -50,16 +51,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
+        title: const Text('Delete Account').tr(),
         content: const Text(
-            'Are you sure you want to permanently delete your account? This action cannot be undone.'),
+                'Are you sure you want to permanently delete your account? This action cannot be undone.')
+            .tr(),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel')),
+              child: const Text('Cancel').tr()),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child:
+                const Text('Delete', style: TextStyle(color: Colors.red)).tr(),
           ),
         ],
       ),
@@ -80,7 +83,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'Error: ${e.message}. Please sign in again to delete your account.')),
+                      'Error: ${e.message}. Please sign in again to delete your account.')
+                  .tr()),
         );
       }
     }
@@ -105,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
             return Center(
-                child: Text('Failed to load profile: ${snapshot.error}'));
+                child: Text('Failed to load profile: ${snapshot.error}').tr());
           }
 
           final data = snapshot.data!;
@@ -138,12 +142,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(data['name'] ?? 'N/A',
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold)),
+                              style: const TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold))
+                          .tr(),
                       const SizedBox(height: 4),
                       Text(_translateUserType(data['userType']),
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.grey)),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.grey))
+                          .tr(),
                     ],
                   ),
                 ),
@@ -164,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                         color: Colors.blue,
                         decoration: TextDecoration.underline),
-                  ),
+                  ).tr(),
                 ),
                 const Spacer(), // Pushes the bottom buttons down
                 _buildActionButton(
@@ -203,10 +209,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(text,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16))
+            .tr(),
       ),
     );
   }

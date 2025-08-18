@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -61,8 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('User data not found. Please contact support.'),
+            SnackBar(
+                content:
+                    Text(tr('User data not found. Please contact support.')),
                 backgroundColor: Colors.orange),
           );
         }
@@ -75,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
         message = 'Incorrect email or password.';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
+        SnackBar(content: Text(tr(message)), backgroundColor: Colors.red),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -194,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(color: Color(0xFF0A2342)),
-                        ),
+                        ).tr(),
                       ),
                     ],
                   ),
@@ -225,13 +227,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
+                          ).tr(),
                   ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Don't have an account?"),
+                      const Text("Don't have an account?").tr(),
                       TextButton(
                         onPressed: () {
                           Navigator.pushReplacementNamed(context, '/signup');
@@ -242,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Color(0xFF0A2342),
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
+                        ).tr(),
                       ),
                     ],
                   ),
