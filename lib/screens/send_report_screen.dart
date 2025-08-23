@@ -237,7 +237,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Send Report').tr(),
+        title: Text("send_report_title".tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
@@ -319,7 +319,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Report Type',
+                          const Text('report_type_label',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold))
@@ -330,7 +330,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12))),
-                            hint: const Text('Select a report type').tr(),
+                            hint: const Text('select_report_type_hint').tr(),
                             items: _reportTypes
                                 .map((type) => DropdownMenuItem(
                                     value: type, child: Text(type).tr()))
@@ -345,7 +345,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             controller: _descriptionController,
                             enabled: isDescriptionEnabled,
                             decoration: InputDecoration(
-                              labelText: 'Description',
+                              labelText: "description_label".tr(),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12)),
                               fillColor: isDescriptionEnabled

@@ -4,7 +4,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../widgets/route_info_sheet.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class UserMapScreen extends StatefulWidget {
   const UserMapScreen({super.key});
@@ -128,9 +127,9 @@ class _UserMapScreenState extends State<UserMapScreen> {
           height: 80,
           child: GestureDetector(
             onTap: () => _showRouteInfo(doc),
-            child: Column(children: [
-              const Icon(Icons.location_on, color: Colors.green, size: 40),
-              Text(tr('Start'))
+            child: const Column(children: [
+              Icon(Icons.location_on, color: Colors.green, size: 40),
+              Text('Start')
             ]),
           ),
         ),
@@ -140,9 +139,9 @@ class _UserMapScreenState extends State<UserMapScreen> {
           height: 80,
           child: GestureDetector(
             onTap: () => _showRouteInfo(doc),
-            child: Column(children: [
-              const Icon(Icons.flag, color: Colors.green, size: 40),
-              Text(tr('End'))
+            child: const Column(children: [
+              Icon(Icons.flag, color: Colors.green, size: 40),
+              Text('End')
             ]),
           ),
         ),
@@ -163,13 +162,13 @@ class _UserMapScreenState extends State<UserMapScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(tr('nearby_safe_routes'))),
+      appBar: AppBar(title: const Text('Nearby Safe Routes')),
       body: _isLoading
           ? Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text(tr(_statusMessage))
+              Text(_statusMessage)
             ]))
           : FlutterMap(
               options: MapOptions(

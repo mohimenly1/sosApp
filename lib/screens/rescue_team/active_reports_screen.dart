@@ -11,7 +11,7 @@ class ActiveReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr('Active Distress Signals')),
+        title: Text('active_distress_signals'.tr()),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -26,7 +26,7 @@ class ActiveReportsScreen extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
               child: Text(
-                tr('No active distress signals at the moment.'),
+                'no_active_distress_signals'.tr(),
                 style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             );
@@ -42,7 +42,7 @@ class ActiveReportsScreen extends StatelessWidget {
               final dataObject = report.data();
               if (dataObject is! Map<String, dynamic>) {
                 return Card(
-                    child: ListTile(title: Text(tr('Invalid report format.'))));
+                    child: ListTile(title: Text('invalid_report_format'.tr())));
               }
               final data = dataObject;
 
@@ -57,7 +57,7 @@ class ActiveReportsScreen extends StatelessWidget {
                   leading: const Icon(Icons.sos, color: Colors.red, size: 40),
                   title: UserInfoWidget(userId: data['userId'] ?? ''),
                   subtitle: Text(
-                    tr('${data['content'] ?? 'No description.'}\nReported at: $formattedDate'),
+                    '${data['content'] ?? 'no_description'.tr()}\n${'reported_at'.tr()} $formattedDate',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -88,7 +88,7 @@ class UserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (userId.isEmpty) {
-      return Text(tr('Unknown User'),
+      return Text('unknown_user'.tr(),
           style: const TextStyle(fontWeight: FontWeight.bold));
     }
 
@@ -98,10 +98,10 @@ class UserInfoWidget extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData && snapshot.data!.exists) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
-            return Text(tr(userData['name'] ?? 'Unknown User'),
+            return Text(userData['name'] ?? 'unknown_user'.tr(),
                 style: const TextStyle(fontWeight: FontWeight.bold));
           } else {
-            return Text(tr('Deleted User'),
+            return Text('deleted_user'.tr(),
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.red,
@@ -109,7 +109,7 @@ class UserInfoWidget extends StatelessWidget {
           }
         }
 
-        return Text(tr('Loading user...'),
+        return Text('loading_user'.tr(),
             style: const TextStyle(fontStyle: FontStyle.italic));
       },
     );

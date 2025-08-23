@@ -137,6 +137,8 @@ class MyApp extends StatelessWidget {
         '/weather': (context) => const WeatherScreen(),
         '/all_news': (context) => const AllNewsScreen(),
         '/shelters_map': (context) => const SheltersMapScreen(),
+        '/add_shelter': (context) => const AddShelterScreen(),
+        '/safe_route': (context) => const SafeRoutesScreen(),
       },
     );
   }

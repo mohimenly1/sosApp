@@ -52,7 +52,7 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
       case 'Clinic':
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
-      case 'Shifting Clinic':
+      case 'Mobile Clinic':
         return BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueOrange);
       default:
@@ -85,11 +85,10 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
         'createdBy': user.uid,
         'createdAt': Timestamp.now(),
       });
-      // Refresh markers from Firestore to ensure consistency
       _loadExistingShelters();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr('Failed to add shelter: $e'))),
+        SnackBar(content: Text('${'failed_to_add_shelter'.tr()} $e')),
       );
     }
   }
@@ -97,7 +96,7 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Shelters').tr()),
+      appBar: AppBar(title: Text('add_shelters_title'.tr())),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : GoogleMap(
@@ -113,7 +112,6 @@ class _AddShelterScreenState extends State<AddShelterScreen> {
   }
 }
 
-// A dedicated dialog widget for adding shelter details
 class _AddShelterDialog extends StatefulWidget {
   final LatLng position;
   final Function(String name, String type) onSave;
@@ -126,38 +124,47 @@ class _AddShelterDialog extends StatefulWidget {
 
 class _AddShelterDialogState extends State<_AddShelterDialog> {
   final _nameController = TextEditingController();
+  // Keys for logic remain in English
   String _selectedType = 'Hospital';
-  final List<String> _shelterTypes = ['Hospital', 'Clinic', 'Shifting Clinic'];
+  final List<String> _shelterTypes = ['Hospital', 'Clinic', 'Mobile Clinic'];
+
+  // Map English keys to translation keys
+  final Map<String, String> _translationKeys = {
+    'Hospital': 'hospital',
+    'Clinic': 'clinic',
+    'Mobile Clinic': 'mobile_clinic',
+  };
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Shelter Details').tr(),
+      title: Text('add_shelter_details_title'.tr()),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Shelter Name'),
+            decoration: InputDecoration(labelText: 'shelter_name_label'.tr()),
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _selectedType,
             items: _shelterTypes
-                .map((type) =>
-                    DropdownMenuItem(value: type, child: Text(type).tr()))
+                .map((type) => DropdownMenuItem(
+                    value: type,
+                    child: Text((_translationKeys[type] ?? type).tr())))
                 .toList(),
             onChanged: (value) {
               if (value != null) setState(() => _selectedType = value);
             },
-            decoration: const InputDecoration(labelText: 'Shelter Type'),
+            decoration: InputDecoration(labelText: 'shelter_type_label'.tr()),
           ),
         ],
       ),
       actions: [
         TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel').tr()),
+            child: Text('cancel'.tr())),
         ElevatedButton(
           onPressed: () {
             if (_nameController.text.isNotEmpty) {
@@ -165,7 +172,7 @@ class _AddShelterDialogState extends State<_AddShelterDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('Save').tr(),
+          child: Text('save'.tr()),
         ),
       ],
     );

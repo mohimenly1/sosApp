@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/database_helper.dart'; // Import the database helper
+import '../../services/database_helper.dart';
 import 'team_details_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -95,14 +95,14 @@ class _ManageTeamsScreenState extends State<ManageTeamsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr('Manage Rescue Teams')),
+        title: Text('manage_rescue_teams'.tr()),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _teams.isEmpty
               ? Center(
                   child: Text(
-                    tr('No teams found.\nPress the "+" button to add a new team.'),
+                    'no_teams_found'.tr(),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
@@ -119,10 +119,11 @@ class _ManageTeamsScreenState extends State<ManageTeamsScreen> {
                         child: ListTile(
                           leading:
                               const Icon(Icons.group, color: Color(0xFF0A2342)),
-                          title: Text(tr(team['name']),
+                          title: Text(team['name'],
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(tr('${team['membersCount']} members')),
+                          subtitle: Text(
+                              '${team['membersCount']} ${"members_suffix".tr()}'),
                           trailing: const Icon(Icons.arrow_forward_ios),
                           onTap: () {
                             Navigator.push(
