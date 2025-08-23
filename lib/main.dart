@@ -24,6 +24,8 @@ import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
+import 'widgets/restart_widget.dart'; // 1. Import the new widget
+
 import 'screens/sos_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/medical_file_screen.dart';
@@ -56,12 +58,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized(); // Should be one of the first
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
   await NotificationService().initNotifications();
 
   await FirebaseAppCheck.instance.activate(
@@ -69,13 +72,16 @@ void main() async {
     appleProvider: AppleProvider.debug,
   );
 
-  await EasyLocalization.ensureInitialized();
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      path: 'assets/translations', // The path to your translation files
-      fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+    RestartWidget(
+      child: EasyLocalization(
+        supportedLocales: const [Locale('en'), Locale('ar')],
+        path: 'assets/translations',
+        fallbackLocale: const Locale('en'),
+        // THE FIX: This tells the package to save the user's choice.
+        saveLocale: true,
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -121,17 +127,15 @@ class MyApp extends StatelessWidget {
         '/send_alert': (context) => const SendAlertScreen(),
         '/all_alerts': (context) => const AllAlertsScreen(),
         '/active_reports': (context) => const ActiveReportsScreen(),
-        '/safe_route': (context) => const SafeRoutesScreen(),
-        '/forgot_password': (context) => const ForgotPasswordScreen(),
         '/user_map': (context) => const UserMapScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/chat_list': (context) => const ChatListScreen(),
         '/user_chat_list': (context) => const UserChatListScreen(),
         '/send_report': (context) => const SendReportScreen(),
+        '/forgot_password': (context) => const ForgotPasswordScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
         '/weather': (context) => const WeatherScreen(),
         '/all_news': (context) => const AllNewsScreen(),
-        '/add_shelter': (context) => const AddShelterScreen(),
         '/shelters_map': (context) => const SheltersMapScreen(),
       },
     );

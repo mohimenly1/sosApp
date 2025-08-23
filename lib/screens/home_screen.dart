@@ -1,30 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../widgets/home_grid_button.dart';
 import '../widgets/alert_card_widget.dart';
-import '../services/news_service.dart'; // 1. Import the news service
-import 'package:easy_localization/easy_localization.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final NewsService _newsService = NewsService();
-  late Future<List<NewsArticle>> _newsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _newsFuture = _newsService.fetchNews();
-  }
-
-  Future<void> _launchURL(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
+  // Function to launch the blog URL
+  Future<void> _launchBlogURL() async {
+    final Uri url = Uri.parse('https://almarsad.co/');
+    if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }
   }
@@ -38,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         leading: const SizedBox.shrink(),
         centerTitle: false,
+        title: Text("dashboard".tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
@@ -52,22 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // 2. Use a FutureBuilder to display the latest news
-              FutureBuilder<List<NewsArticle>>(
-                future: _newsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _buildInfoCard("Loading News...");
-                  }
-                  if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data!.isEmpty) {
-                    return _buildInfoCard("News Not Available");
-                  }
-                  final latestArticle = snapshot.data!.first;
-                  return _buildNewsCard(context, latestArticle);
-                },
-              ),
+              // MODIFIED: This now shows the static blog card
+              _buildBlogCard(),
               const SizedBox(height: 20),
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -77,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return _buildInfoCard("No Current Alerts");
+                    return _buildInfoCard("no_current_alerts".tr());
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -101,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(tr('See More Alerts'),
+                    Text("see_more_alerts".tr(),
                         style: const TextStyle(
                             color: Color(0xFF555555),
                             fontWeight: FontWeight.bold)),
@@ -122,31 +96,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   HomeGridButton(
                     icon: Icons.smart_toy_outlined,
-                    label: 'AI Assistant',
+                    label: "ai_assistant".tr(),
                     onTap: () => Navigator.pushNamed(context, '/chat'),
                   ),
                   HomeGridButton(
                     icon: Icons.night_shelter_outlined,
-                    label: 'Shelter',
+                    label: "shelter".tr(),
                     onTap: () => Navigator.pushNamed(context, '/shelters_map'),
                   ),
                   HomeGridButton(
                     icon: Icons.cloud_outlined,
-                    label: 'Weather',
+                    label: "weather".tr(),
                     onTap: () {
                       Navigator.pushNamed(context, '/weather');
                     },
                   ),
                   HomeGridButton(
                     icon: Icons.map_outlined,
-                    label: 'Map',
+                    label: "map".tr(),
                     onTap: () {
                       Navigator.pushNamed(context, '/user_map');
                     },
                   ),
                   HomeGridButton(
                     icon: Icons.report_gmailerrorred,
-                    label: 'Send Report',
+                    label: "send_report".tr(),
                     onTap: () {
                       Navigator.pushNamed(context, '/send_report');
                     },
@@ -160,52 +134,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 3. New widget to display the news article attractively
-  Widget _buildNewsCard(BuildContext context, NewsArticle article) {
+  // NEW: A dedicated widget for the blog link card
+  Widget _buildBlogCard() {
     return InkWell(
-      onTap: () => _launchURL(article.url),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: _launchBlogURL,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.shade200),
+        ),
+        child: Row(
           children: [
-            if (article.urlToImage != null)
-              Image.network(
-                article.urlToImage!,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => SizedBox(
-                    height: 150,
-                    child: Center(child: Text(tr("Image not available")))),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
+            Icon(Icons.article_outlined, color: Colors.blue.shade700, size: 40),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(tr("TODAY'S NEWS"),
-                      style: TextStyle(
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12)),
-                  const SizedBox(height: 4),
-                  Text(tr(article.title),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/all_news'),
-                      child: const Text("Read More...").tr(),
+                  Text(
+                    "official_blog".tr(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "visit_blog_prompt".tr(),
+                    style: TextStyle(color: Colors.blue.shade700),
+                  ),
                 ],
               ),
             ),
@@ -225,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Center(
-          child: Text(title, style: const TextStyle(color: Colors.grey)).tr()),
+          child: Text(title, style: const TextStyle(color: Colors.grey))),
     );
   }
 }

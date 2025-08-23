@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../widgets/restart_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -10,19 +11,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // State for the language dropdown
-  String _selectedLanguage = 'English';
-  final List<String> _languages = ['English', 'العربية'];
-
-  // Function to handle the sign-out process
   Future<void> _signOut(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // After signing out, navigate to the login screen and remove all previous routes
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     } catch (e) {
-      // Show an error message if sign-out fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to sign out: $e')),
       );
@@ -50,7 +44,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Rebuilding the options to match the new design
             _buildSettingsOption(
               icon: Icons.person_outline,
               title: "profile".tr(),
@@ -67,7 +60,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
             const SizedBox(height: 16),
-            // MODIFIED: This now uses a DropdownButton
             _buildSettingsOption(
               icon: Icons.language_outlined,
               title: "language".tr(),
@@ -79,26 +71,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   DropdownMenuItem(value: Locale('en'), child: Text('English')),
                   DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
                 ],
+                // THE FIX: Schedule the locale change and restart for after the build cycle.
                 onChanged: (newValue) {
                   if (newValue != null) {
-                    // This command changes the language of the entire app
-                    context.setLocale(newValue);
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await context.setLocale(newValue);
+                      RestartWidget.restartApp(context);
+                    });
                   }
                 },
               ),
               onTap: () {},
             ),
-            // const SizedBox(height: 16),
-            // _buildSettingsOption(
-            //   icon: Icons.privacy_tip_outlined,
-            //   title: "privacy_policy".tr(),
-            //   onTap: () {/* TODO: Navigate to Privacy Policy */},
-            // ),
             const SizedBox(height: 16),
             _buildSettingsOption(
               icon: Icons.logout,
               title: "sign_out".tr(),
-              isDestructive: true, // To make the text red
+              isDestructive: true,
               onTap: () => _signOut(context),
             ),
           ],
@@ -107,7 +96,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Helper widget to create the classic button style from the image
   Widget _buildSettingsOption({
     required IconData icon,
     required String title,

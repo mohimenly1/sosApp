@@ -15,18 +15,22 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
 
-  // To hold all markers fetched from Firestore
   final Map<String, Marker> _allMarkers = {};
-  // To hold the markers currently displayed on the map after filtering
   Set<Marker> _filteredMarkers = {};
-
   bool _isLoading = true;
 
-  // To keep track of which filters are active
+  // The keys remain in English for logic, but the labels will be translated.
   final Map<String, bool> _filters = {
     'Hospital': true,
     'Clinic': true,
-    'Shifting Clinic': true,
+    'Mobile Clinic': true,
+  };
+
+  // Map English keys to translation keys
+  final Map<String, String> _translationKeys = {
+    'Hospital': 'hospital',
+    'Clinic': 'clinic',
+    'Mobile Clinic': 'mobile_clinic',
   };
 
   @override
@@ -52,7 +56,7 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
       );
       _allMarkers[doc.id] = marker;
     }
-    _applyFilters(); // Apply initial filters
+    _applyFilters();
     if (mounted) {
       setState(() => _isLoading = false);
     }
@@ -64,7 +68,7 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
       case 'Clinic':
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
-      case 'Shifting Clinic':
+      case 'Mobile Clinic':
         return BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueOrange);
       default:
@@ -90,7 +94,7 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shelters & Medical Points').tr()),
+      appBar: AppBar(title: Text('shelters_medical_points'.tr())),
       body: Stack(
         children: [
           _isLoading
@@ -104,7 +108,6 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
                       _mapController.complete(controller),
                   markers: _filteredMarkers,
                 ),
-          // Filter UI at the top of the screen
           Positioned(
             top: 10,
             left: 10,
@@ -116,8 +119,10 @@ class _SheltersMapScreenState extends State<SheltersMapScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: _filters.keys.map((type) {
+                    // Use the translation key for the label
+                    final translationKey = _translationKeys[type] ?? type;
                     return FilterChip(
-                      label: Text(type).tr(),
+                      label: Text(translationKey.tr()),
                       selected: _filters[type]!,
                       onSelected: (bool selected) {
                         setState(() {

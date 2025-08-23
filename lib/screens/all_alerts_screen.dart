@@ -94,7 +94,7 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Emergency Alerts').tr(),
+        title: const Text('see_more_alerts').tr(),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

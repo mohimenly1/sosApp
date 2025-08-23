@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:url_launcher/url_launcher.dart'; // For opening links and making calls
-import 'package:easy_localization/easy_localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -28,26 +27,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return "individual".tr();
       case 'rescue_team':
         return "rescue_team".tr();
-      case 'government_entity':
-        return "government_entity".tr();
       default:
         return "individual".tr();
     }
   }
 
-  // MODIFIED: This function now makes a phone call
-  Future<void> _makeEmergencyCall() async {
-    final Uri url = Uri.parse('tel:1412');
+  Future<void> _makePhoneCall(String number) async {
+    final Uri url = Uri.parse('tel:$number');
     if (!await launchUrl(url)) {
-      // Show an error if the call could not be made
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not make a call to $url').tr()),
+        SnackBar(content: Text('Could not make a call to $number').tr()),
       );
     }
   }
 
   Future<void> _deleteAccount() async {
-    // Show confirmation dialog first
     final bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -70,7 +64,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (confirm == true && _userId != null) {
       try {
-        // TODO: Delete user's data from Firestore (e.g., reports, medical files) before deleting the user account.
         await FirebaseFirestore.instance
             .collection('users')
             .doc(_userId)
@@ -88,6 +81,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     }
+  }
+
+  // ======== عرض أرقام الطوارئ في Bottom Sheet ========
+  void _showEmergencyNumbers() {
+    final List<Map<String, String>> numbers = [
+      {'name': 'غرفة عمليات الطب الميداني', 'number': '0916288000'},
+      {'name': 'غرفة العمليات المركزية', 'number': '0921910191'},
+      {'name': 'جهاز الإسعاف والطوارئ', 'number': '0931911191'},
+      {'name': 'هيئة السلامة الوطنية', 'number': '190'},
+      {'name': 'الشركة العامة للكهرباء', 'number': '1418'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView.separated(
+        itemCount: numbers.length,
+        separatorBuilder: (_, __) => const Divider(),
+        itemBuilder: (context, index) {
+          final item = numbers[index];
+          return ListTile(
+            title: Text(item['name']!),
+            subtitle: Text(item['number']!),
+            trailing: const Icon(Icons.call, color: Colors.green),
+            onTap: () => _makePhoneCall(item['number']!),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -119,7 +140,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: Column(
               children: [
-                // Profile Header Card
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -154,7 +174,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Buttons Section
                 _buildActionButton(
                   text: 'Medical ID',
                   onPressed: () =>
@@ -162,17 +181,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: const Color(0xFF0A2342),
                 ),
                 const SizedBox(height: 16),
-                // MODIFIED: This now makes a phone call instead of opening a URL
-                InkWell(
-                  onTap: _makeEmergencyCall,
-                  child: const Text(
-                    'مركز طب الطوارئ والدعم (1412)',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline),
-                  ).tr(),
+                _buildActionButton(
+                  text: 'أرقام الطوارئ',
+                  onPressed: _showEmergencyNumbers,
+                  color: Colors.orange.shade700,
                 ),
-                const Spacer(), // Pushes the bottom buttons down
+                const Spacer(),
                 _buildActionButton(
                   text: 'Edit Profile',
                   onPressed: () =>

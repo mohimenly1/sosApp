@@ -163,7 +163,7 @@ class _UserMapScreenState extends State<UserMapScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(tr('Nearby Safe Routes'))),
+      appBar: AppBar(title: Text(tr('nearby_safe_routes'))),
       body: _isLoading
           ? Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [

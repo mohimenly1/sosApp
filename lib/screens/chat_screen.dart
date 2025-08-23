@@ -174,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-          title: Text("AI Assistant").tr(),
+          title: Text("ai_assistant").tr(),
           backgroundColor: primaryColor,
           foregroundColor: Colors.white),
       body: Column(
