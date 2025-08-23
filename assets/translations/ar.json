@@ -36,5 +36,18 @@
   "mobile_clinic": "مستوصف متنقل",
     "official_blog": "المدونة الرسمية",
   "visit_blog_prompt": "للإطلاع على آخر الأحداث والأخبار، تفضل بزيارة المدونة الرسمية.",
-  "nearby_safe_routes": "اقرب مسارات امنة."
+  "nearby_safe_routes": "اقرب مسارات امنة.",
+  "rescue_dashboard": "لوحة تحكم الإنقاذ",
+  "manage_teams": "إدارة الفرق",
+  "active_reports": "البلاغات النشطة",
+  "live_map": "الخريطة المباشرة",
+  "chat_box": "صندوق المحادثات",
+  "add_shelters": "إضافة ملاجئ",
+  "emergency_numbers_title": "أرقام الطوارئ",
+  "field_medicine_ops_room": "غرفة عمليات الطب الميداني",
+  "central_ops_room": "غرفة العمليات المركزية",
+  "ambulance_emergency_service": "جهاز الإسعاف والطوارئ",
+  "national_safety_authority": "هيئة السلامة الوطنية",
+  "general_electricity_company": "الشركة العامة للكهرباء",
+  "emergency_medical_support_center": "مركز طب الطوارئ والدعم (1412)"
 }

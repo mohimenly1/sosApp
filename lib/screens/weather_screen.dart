@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../services/weather_service.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -64,11 +63,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weather Forecast').tr()),
+      appBar: AppBar(title: const Text('Weather Forecast')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text('Error: $_errorMessage').tr())
+              ? Center(child: Text('Error: $_errorMessage'))
               : _buildWeatherView(),
     );
   }
@@ -92,10 +91,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  Text(location['name'].tr(),
+                  Text(location['name'],
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold)),
-                  Text(location['country'].tr(),
+                  Text(location['country'],
                       style: const TextStyle(fontSize: 16, color: Colors.grey)),
                   const SizedBox(height: 16),
                   Row(
@@ -105,24 +104,20 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           scale: 0.8),
                       const SizedBox(width: 16),
                       Text('${current['temp_c'].round()}°C',
-                              style: const TextStyle(
-                                  fontSize: 56, fontWeight: FontWeight.w300))
-                          .tr(),
+                          style: const TextStyle(
+                              fontSize: 56, fontWeight: FontWeight.w300)),
                     ],
                   ),
                   Text(current['condition']['text'],
-                          style:
-                              TextStyle(fontSize: 20, color: Colors.grey[700]))
-                      .tr(),
+                      style: TextStyle(fontSize: 20, color: Colors.grey[700])),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 24),
           // Daily Forecast
-          Text('3-Day Forecast',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-              .tr(),
+          const Text('3-Day Forecast',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           ...forecastDays.map<Widget>((day) {
             final date = DateTime.parse(day['date']);
@@ -131,12 +126,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
               child: ListTile(
                 leading:
                     Image.network('http:${day['day']['condition']['icon']}'),
-                title: Text(DateFormat('EEEE').format(date))
-                    .tr(), // Day of the week
-                subtitle: Text(day['day']['condition']['text']).tr(),
+                title: Text(DateFormat('EEEE').format(date)), // Day of the week
+                subtitle: Text(day['day']['condition']['text']),
                 trailing: Text(
-                        '${day['day']['maxtemp_c'].round()}° / ${day['day']['mintemp_c'].round()}°')
-                    .tr(),
+                    '${day['day']['maxtemp_c'].round()}° / ${day['day']['mintemp_c'].round()}°'),
               ),
             );
           }).toList(),

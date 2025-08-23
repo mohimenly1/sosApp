@@ -36,5 +36,18 @@
   "mobile_clinic": "Mobile Clinic",
   "official_blog": "Official Blog",
   "visit_blog_prompt": "For the latest events and news, please visit the official blog.",
-  "nearby_safe_routes": "Nearby Safe Routes"
+  "nearby_safe_routes": "Nearby Safe Routes",
+  "rescue_dashboard": "Rescue Dashboard",
+  "manage_teams": "Manage Teams",
+  "active_reports": "Active Reports",
+  "live_map": "Live Map",
+  "chat_box": "Chat Box",
+  "add_shelters": "Add Shelters",
+  "emergency_numbers_title": "Emergency Numbers",
+  "field_medicine_ops_room": "Field Medicine Operations Room",
+  "central_ops_room": "Central Operations Room",
+  "ambulance_emergency_service": "Ambulance and Emergency Service",
+  "national_safety_authority": "National Safety Authority",
+  "general_electricity_company": "General Electricity Company",
+  "emergency_medical_support_center": "Emergency Medical Support Center (1412)"
 }

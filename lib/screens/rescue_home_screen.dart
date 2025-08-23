@@ -11,17 +11,16 @@ class RescueHomeScreen extends StatelessWidget {
     return MainScaffold(
       body: Scaffold(
         appBar: AppBar(
+          title: Text("rescue_dashboard".tr()),
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
               icon: const Icon(Icons.settings_outlined, color: Colors.white),
               onPressed: () => Navigator.pushNamed(context, '/settings'),
-              tooltip: 'Settings',
+              tooltip: 'settings'.tr(),
             ),
           ],
         ),
-        // MODIFIED: Wrapped in a SingleChildScrollView and removed Expanded
-        // to allow the button to follow the grid naturally.
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -31,44 +30,42 @@ class RescueHomeScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 childAspectRatio: 1.2,
-                shrinkWrap: true, // Necessary inside a SingleChildScrollView
-                physics:
-                    const NeverScrollableScrollPhysics(), // To prevent nested scrolling
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   HomeGridButton(
                     icon: Icons.group_add_outlined,
-                    label: 'Manage Teams',
+                    label: "manage_teams".tr(),
                     onTap: () => Navigator.pushNamed(context, '/manage_teams'),
                   ),
                   HomeGridButton(
                     icon: Icons.warning_amber_rounded,
-                    label: 'Active Reports',
+                    label: "active_reports".tr(),
                     onTap: () =>
                         Navigator.pushNamed(context, '/active_reports'),
                   ),
                   HomeGridButton(
                     icon: Icons.map_outlined,
-                    label: 'Live Map',
+                    label: "live_map".tr(),
                     onTap: () => Navigator.pushNamed(context, '/user_map'),
                   ),
                   HomeGridButton(
                     icon: Icons.smart_toy_outlined,
-                    label: 'AI Assistant',
+                    label: "ai_assistant".tr(),
                     onTap: () => Navigator.pushNamed(context, '/chat'),
                   ),
                   HomeGridButton(
                     icon: Icons.chat_bubble_outline,
-                    label: 'Chat Box',
+                    label: "chat_box".tr(),
                     onTap: () => Navigator.pushNamed(context, '/chat_list'),
                   ),
                   HomeGridButton(
                     icon: Icons.cloud_outlined,
-                    label: 'Weather',
+                    label: "weather".tr(),
                     onTap: () => Navigator.pushNamed(context, '/weather'),
                   ),
                 ],
               ),
-              // This button now sits directly below the grid with consistent padding.
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
                 child: SizedBox(
@@ -76,9 +73,9 @@ class RescueHomeScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.add_location_alt_outlined,
                         color: Colors.white),
-                    label: const Text('Add Shelters',
-                            style: TextStyle(color: Colors.white, fontSize: 16))
-                        .tr(),
+                    label: Text("add_shelters".tr(),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16)),
                     onPressed: () =>
                         Navigator.pushNamed(context, '/add_shelter'),
                     style: ElevatedButton.styleFrom(

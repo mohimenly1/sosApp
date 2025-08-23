@@ -27,6 +27,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return "individual".tr();
       case 'rescue_team':
         return "rescue_team".tr();
+      case 'government_entity':
+        return "government_entity".tr();
       default:
         return "individual".tr();
     }
@@ -36,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final Uri url = Uri.parse('tel:$number');
     if (!await launchUrl(url)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not make a call to $number').tr()),
+        SnackBar(content: Text('Could not make a call to $number')),
       );
     }
   }
@@ -45,18 +47,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account').tr(),
-        content: const Text(
-                'Are you sure you want to permanently delete your account? This action cannot be undone.')
-            .tr(),
+        title: Text('delete_account'.tr()),
+        content: Text('are_you_sure_delete_account'.tr()),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel').tr()),
+              child: Text('cancel'.tr())),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child:
-                const Text('Delete', style: TextStyle(color: Colors.red)).tr(),
+                Text('delete'.tr(), style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -76,37 +76,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                      'Error: ${e.message}. Please sign in again to delete your account.')
-                  .tr()),
+                  'Error: ${e.message}. Please sign in again to delete your account.')),
         );
       }
     }
   }
 
-  // ======== عرض أرقام الطوارئ في Bottom Sheet ========
   void _showEmergencyNumbers() {
     final List<Map<String, String>> numbers = [
-      {'name': 'غرفة عمليات الطب الميداني', 'number': '0916288000'},
-      {'name': 'غرفة العمليات المركزية', 'number': '0921910191'},
-      {'name': 'جهاز الإسعاف والطوارئ', 'number': '0931911191'},
-      {'name': 'هيئة السلامة الوطنية', 'number': '190'},
-      {'name': 'الشركة العامة للكهرباء', 'number': '1418'},
+      {'key': 'field_medicine_ops_room', 'number': '0916288000'},
+      {'key': 'central_ops_room', 'number': '0921910191'},
+      {'key': 'ambulance_emergency_service', 'number': '0931911191'},
+      {'key': 'national_safety_authority', 'number': '190'},
+      {'key': 'general_electricity_company', 'number': '1418'},
     ];
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => ListView.separated(
-        itemCount: numbers.length,
-        separatorBuilder: (_, __) => const Divider(),
-        itemBuilder: (context, index) {
-          final item = numbers[index];
-          return ListTile(
-            title: Text(item['name']!),
-            subtitle: Text(item['number']!),
-            trailing: const Icon(Icons.call, color: Colors.green),
-            onTap: () => _makePhoneCall(item['number']!),
-          );
-        },
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text('emergency_numbers_title'.tr(),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: numbers.length,
+              separatorBuilder: (_, __) => const Divider(),
+              itemBuilder: (context, index) {
+                final item = numbers[index];
+                return ListTile(
+                  title: Text(item['key']!.tr()),
+                  subtitle: Text(item['number']!),
+                  trailing: const Icon(Icons.call, color: Colors.green),
+                  onTap: () => _makePhoneCall(item['number']!),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -130,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
             return Center(
-                child: Text('Failed to load profile: ${snapshot.error}').tr());
+                child: Text('Failed to load profile: ${snapshot.error}'));
           }
 
           final data = snapshot.data!;
@@ -162,40 +174,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(data['name'] ?? 'N/A',
-                              style: const TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold))
-                          .tr(),
+                          style: const TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
                       Text(_translateUserType(data['userType']),
-                              style: const TextStyle(
-                                  fontSize: 16, color: Colors.grey))
-                          .tr(),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.grey)),
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
                 _buildActionButton(
-                  text: 'Medical ID',
+                  text: 'medical_file'.tr(),
                   onPressed: () =>
                       Navigator.pushNamed(context, '/medical_file'),
                   color: const Color(0xFF0A2342),
                 ),
                 const SizedBox(height: 16),
+                InkWell(
+                  onTap: () => _makePhoneCall('1412'),
+                  child: Text(
+                    'emergency_medical_support_center'.tr(),
+                    style: const TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 _buildActionButton(
-                  text: 'أرقام الطوارئ',
+                  text: 'emergency_numbers_title'.tr(),
                   onPressed: _showEmergencyNumbers,
                   color: Colors.orange.shade700,
                 ),
                 const Spacer(),
                 _buildActionButton(
-                  text: 'Edit Profile',
+                  text: 'edit_profile'.tr(),
                   onPressed: () =>
                       Navigator.pushNamed(context, '/edit_profile'),
                   color: Colors.green.shade700,
                 ),
                 const SizedBox(height: 16),
                 _buildActionButton(
-                  text: 'Delete Account',
+                  text: 'delete_account'.tr(),
                   onPressed: _deleteAccount,
                   color: Colors.red.shade700,
                 ),
@@ -223,11 +243,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(text,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16))
-            .tr(),
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16)),
       ),
     );
   }

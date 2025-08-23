@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../widgets/restart_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -71,13 +70,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   DropdownMenuItem(value: Locale('en'), child: Text('English')),
                   DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
                 ],
-                // THE FIX: Schedule the locale change and restart for after the build cycle.
-                onChanged: (newValue) {
+                // THE FIX: Navigate to the splash screen to force a full app reload.
+                onChanged: (newValue) async {
                   if (newValue != null) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await context.setLocale(newValue);
-                      RestartWidget.restartApp(context);
-                    });
+                    await context.setLocale(newValue);
+                    // This is a more robust way to ensure the entire app reloads with the new language.
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/splash', (route) => false);
                   }
                 },
               ),
