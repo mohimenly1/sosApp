@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/database_helper.dart'; // Import the database helper
+import '../services/database_helper.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class MedicalFileScreen extends StatefulWidget {
@@ -30,6 +30,15 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
     _initAndSyncData();
   }
 
+  @override
+  void dispose() {
+    _bloodTypeController.dispose();
+    _diseasesController.dispose();
+    _allergiesController.dispose();
+    _emergencyContactController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initAndSyncData() async {
     await _loadLocalData();
     _syncFirestoreData();
@@ -40,7 +49,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
       setState(() => _isLoading = false);
       return;
     }
-    final localData = await _dbHelper.getMedicalFileByOwnerId(_currentUserId);
+    final localData = await _dbHelper.getMedicalFileByOwnerId(_currentUserId!);
     if (mounted && localData != null) {
       setState(() {
         _medicalFileId = localData['id'];
@@ -85,7 +94,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
           };
 
           await _dbHelper.insertMedicalFile(fileForDb);
-          await _loadLocalData(); // Reload UI with fresh data
+          await _loadLocalData();
         }
       }
     } catch (e) {
@@ -118,7 +127,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
             .update({
           'medicalFileId': newMedicalDoc.id,
         });
-        _medicalFileId = newMedicalDoc.id; // Update local ID
+        _medicalFileId = newMedicalDoc.id;
       } else {
         await FirebaseFirestore.instance
             .collection('medical_files')
@@ -126,7 +135,6 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
             .update(medicalData);
       }
 
-      // After saving to Firestore, also save to local DB
       final lastUpdated = (medicalData['lastUpdated'] as Timestamp).toDate();
       final fileForDb = {
         'id': _medicalFileId,
@@ -138,13 +146,13 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(tr('Medical file saved successfully!')),
+            content: Text("medical_file_saved_successfully".tr()),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr('Failed to save data: $e'))),
+        SnackBar(content: Text("${"failed_to_save_data".tr()} $e")),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -155,7 +163,7 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr("Medical File")),
+        title: Text("medical_file_title".tr()),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -169,49 +177,49 @@ class _MedicalFileScreenState extends State<MedicalFileScreen> {
                     const Icon(Icons.medical_services,
                         size: 60, color: Color(0xFF0A2342)),
                     const SizedBox(height: 16),
-                    const Text(
-                      "Your medical information is crucial in an emergency. Please keep it updated.",
+                    Text(
+                      "medical_info_prompt".tr(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ).tr(),
+                      style: const TextStyle(color: Colors.grey),
+                    ),
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _bloodTypeController,
-                      decoration: const InputDecoration(
-                          labelText: "Blood Type (e.g., O+)"),
+                      decoration:
+                          InputDecoration(labelText: "blood_type_label".tr()),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _diseasesController,
-                      decoration:
-                          const InputDecoration(labelText: "Chronic Diseases"),
+                      decoration: InputDecoration(
+                          labelText: "chronic_diseases_label".tr()),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _allergiesController,
-                      decoration: const InputDecoration(labelText: "Allergies"),
+                      decoration:
+                          InputDecoration(labelText: "allergies_label".tr()),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _emergencyContactController,
-                      decoration: const InputDecoration(
-                          labelText: "Emergency Contact (Name & Phone)"),
+                      decoration: InputDecoration(
+                          labelText: "emergency_contact_label".tr()),
                       keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 40),
                     ElevatedButton(
-                      onPressed: _saveMedicalFile,
+                      onPressed: _isLoading ? null : _saveMedicalFile,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0A2342),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text("Save Information",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold))
-                          .tr(),
+                      child: Text("save_information_button".tr(),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),

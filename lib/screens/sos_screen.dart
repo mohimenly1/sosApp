@@ -16,12 +16,14 @@ class SosScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Distress Signal').tr(),
+        title: Text('distress_signal_title'.tr()),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white, size: 28),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
           ),
         ],
       ),

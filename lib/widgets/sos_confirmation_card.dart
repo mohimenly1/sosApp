@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import '../screens/sos_report_map_screen.dart'; // 1. Import the new full-screen page
+import '../screens/sos_report_map_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class SosConfirmationCard extends StatefulWidget {
@@ -17,13 +17,11 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
     setState(() => _isDeterminingLocation = true);
 
     try {
-      // Get the user's current position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
       if (mounted) {
-        // 2. Navigate to the new full-screen page with the location data
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -33,7 +31,7 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not get location: $e').tr()),
+        SnackBar(content: Text('${"could_not_get_location".tr()} $e')),
       );
     } finally {
       if (mounted) {
@@ -61,15 +59,15 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Do you want to send\na distress signal?',
+          Text(
+            'sos_prompt'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF0A2342),
             ),
-          ).tr(),
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -86,9 +84,9 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
                 ),
                 child: _isDeterminingLocation
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Yes',
-                            style: TextStyle(color: Colors.white, fontSize: 18))
-                        .tr(),
+                    : Text('yes'.tr(),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -98,9 +96,8 @@ class _SosConfirmationCardState extends State<SosConfirmationCard> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('No',
-                        style: TextStyle(color: Colors.white, fontSize: 18))
-                    .tr(),
+                child: Text('no'.tr(),
+                    style: const TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ],
           ),

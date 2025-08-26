@@ -14,7 +14,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _emailController = TextEditingController(); // For the new email field
+  final _emailController = TextEditingController();
   bool _isLoading = true;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
@@ -22,6 +22,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserData() async {
@@ -38,12 +46,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final data = userDoc.data()!;
         _nameController.text = data['name'] ?? '';
         _phoneController.text = data['phone'] ?? '';
-        _emailController.text =
-            _currentUser!.email ?? ''; // Load email from Auth
+        _emailController.text = _currentUser!.email ?? '';
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load profile data: $e')),
+        SnackBar(content: Text('${"failed_to_load_profile".tr()} $e')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -60,48 +67,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final newPhone = _phoneController.text.trim();
 
     try {
-      // Step 1: Handle email change if it's different
       if (newEmail != _currentUser!.email) {
         await _currentUser!.verifyBeforeUpdateEmail(newEmail);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Verification link sent to your new email. Please verify to update.'),
+          SnackBar(
+            content: Text("email_verification_sent".tr()),
             backgroundColor: Colors.orange,
           ),
         );
       }
 
-      // Step 2: Update Firestore data
       await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
           .update({
         'name': newName,
         'phone': newPhone,
-        'email': newEmail, // Update email in Firestore as well
+        'email': newEmail,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Profile updated successfully!'),
+        SnackBar(
+            content: Text("profile_updated_successfully".tr()),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       String message = 'An error occurred.';
       if (e.code == 'requires-recent-login') {
-        message =
-            'This action is sensitive and requires recent authentication. Please sign out and sign in again before updating your email.';
+        message = "requires_recent_login".tr();
       } else {
-        message = e.message ?? 'Failed to update profile.';
+        message = e.message ?? "failed_to_update_profile".tr();
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile: $e')),
+        SnackBar(content: Text('${"failed_to_update_profile".tr()} $e')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -111,7 +114,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: Text("edit_profile_title".tr())),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -122,32 +125,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Full Name'),
+                      decoration:
+                          InputDecoration(labelText: "full_name_label".tr()),
                       validator: (value) =>
-                          value!.isEmpty ? 'Please enter your name' : null,
+                          value!.isEmpty ? "validator_enter_name".tr() : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _phoneController,
                       decoration:
-                          const InputDecoration(labelText: 'Phone Number'),
+                          InputDecoration(labelText: "phone_number_label".tr()),
                       keyboardType: TextInputType.phone,
-                      validator: (value) => value!.isEmpty
-                          ? 'Please enter your phone number'
-                          : null,
+                      validator: (value) =>
+                          value!.isEmpty ? "validator_enter_phone".tr() : null,
                     ),
                     const SizedBox(height: 16),
-                    // New TextFormField for email
                     TextFormField(
                       controller: _emailController,
-                      decoration:
-                          const InputDecoration(labelText: 'Email Address'),
+                      decoration: InputDecoration(
+                          labelText: "email_address_label".tr()),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
                             !value.contains('@')) {
-                          return 'Please enter a valid email';
+                          return "validator_enter_valid_email".tr();
                         }
                         return null;
                       },
@@ -159,8 +161,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         backgroundColor: const Color(0xFF0A2342),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: const Text('Save Changes',
-                          style: TextStyle(color: Colors.white)),
+                      child: Text("save_changes_button".tr(),
+                          style: const TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

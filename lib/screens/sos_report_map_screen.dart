@@ -82,13 +82,13 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(tr('Distress signal sent successfully!')),
+            content: Text('distress_signal_sent_successfully'.tr()),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop(); // Go back from this screen
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send report: $e').tr()));
+          SnackBar(content: Text('${'failed_to_send_report'.tr()}: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -97,10 +97,9 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirm Incident Location').tr()),
+      appBar: AppBar(title: Text('confirm_incident_location'.tr())),
       body: Stack(
         children: [
-          // Full-screen Google Map
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _reportLocation,
@@ -123,7 +122,6 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
               ),
             },
           ),
-          // Controls at the bottom
           Positioned(
             bottom: 0,
             left: 0,
@@ -140,7 +138,7 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
                     TextField(
                       controller: _descriptionController,
                       decoration: InputDecoration(
-                        hintText: 'Description (optional)',
+                        hintText: 'description_optional'.tr(),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12)),
                         suffixIcon: IconButton(
@@ -153,9 +151,8 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                                'Image attached: ${path.basename(_imageFile!.path)}',
-                                style: const TextStyle(color: Colors.green))
-                            .tr(),
+                            '${'image_attached'.tr()} ${path.basename(_imageFile!.path)}',
+                            style: const TextStyle(color: Colors.green)),
                       ),
                     const SizedBox(height: 16),
                     SizedBox(
@@ -169,10 +166,9 @@ class _SosReportMapScreenState extends State<SosReportMapScreen> {
                         child: _isLoading
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
-                            : const Text('Send Now',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18))
-                                .tr(),
+                            : Text('send_now'.tr(),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                       ),
                     ),
                   ],

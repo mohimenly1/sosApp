@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart'; // 1. Import Geolocator
+import 'package:geolocator/geolocator.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class AddTeamScreen extends StatefulWidget {
@@ -25,10 +25,8 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
   double _safetyLevel = 3.0;
   bool _isOfflineAvailable = false;
 
-  // 2. Add a MapController and a variable for the initial center
   final MapController _mapController = MapController();
-  LatLng _initialCenter =
-      const LatLng(32.885353, 13.180161); // Default to Tripoli
+  LatLng _initialCenter = const LatLng(32.885353, 13.180161);
 
   @override
   void initState() {
@@ -36,7 +34,13 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
     _getCurrentLocationAndCenterMap();
   }
 
-  // 3. New function to get current location and update the map
+  @override
+  void dispose() {
+    _teamNameController.dispose();
+    _membersCountController.dispose();
+    super.dispose();
+  }
+
   Future<void> _getCurrentLocationAndCenterMap() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -50,7 +54,6 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
       }
     } catch (e) {
       print("Could not get location: $e");
-      // If location fails, the map will remain centered on the default location
     }
   }
 
@@ -58,9 +61,7 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_startPoint == null || _endPoint == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('Please select a start and end point on the map.').tr()),
+        SnackBar(content: Text('validator_select_map_points'.tr())),
       );
       return;
     }
@@ -93,13 +94,13 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Team and route created successfully!').tr(),
+            content: Text('team_created_successfully'.tr()),
             backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save data: $e').tr()),
+        SnackBar(content: Text('${'failed_to_save_team'.tr()} $e')),
       );
     } finally {
       if (mounted) {
@@ -111,7 +112,7 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add New Team').tr()),
+      appBar: AppBar(title: Text('add_new_team_title'.tr())),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -121,37 +122,34 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
             children: [
               TextFormField(
                 controller: _teamNameController,
-                decoration: const InputDecoration(labelText: 'Team Name'),
+                decoration: InputDecoration(labelText: 'team_name_label'.tr()),
                 validator: (value) =>
-                    value!.isEmpty ? 'Please enter a team name' : null,
+                    value!.isEmpty ? 'validator_enter_team_name'.tr() : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _membersCountController,
                 decoration:
-                    const InputDecoration(labelText: 'Number of Members'),
+                    InputDecoration(labelText: 'members_count_label'.tr()),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty
-                    ? 'Please enter the number of members'
+                    ? 'validator_enter_members_count'.tr()
                     : null,
               ),
               const SizedBox(height: 24),
-              const Text('Define Evacuation Route',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                  .tr(),
-              Text('Tap on the map to set Start (S) and End (E) points.',
-                      style: TextStyle(color: Colors.grey))
-                  .tr(),
+              Text('define_evacuation_route'.tr(),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('map_tap_instruction'.tr(),
+                  style: const TextStyle(color: Colors.grey)),
               const SizedBox(height: 8),
               SizedBox(
                 height: 300,
                 child: FlutterMap(
-                  // 4. Use the map controller and initial center variable
                   mapController: _mapController,
                   options: MapOptions(
                     initialCenter: _initialCenter,
-                    initialZoom: 13.0, // A closer zoom level
+                    initialZoom: 13.0,
                     onTap: (tapPosition, point) {
                       setState(() {
                         if (_startPoint == null || _endPoint != null) {
@@ -198,7 +196,7 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('Route Safety Level: ${_safetyLevel.toInt()}',
+              Text('${'route_safety_level'.tr()} ${_safetyLevel.toInt()}',
                   style: const TextStyle(fontWeight: FontWeight.w500)),
               Slider(
                 value: _safetyLevel,
@@ -214,9 +212,8 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
               ),
               const SizedBox(height: 16),
               SwitchListTile(
-                title: const Text('Make route available offline?',
-                        style: TextStyle(fontWeight: FontWeight.w500))
-                    .tr(),
+                title: Text('make_route_offline'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.w500)),
                 value: _isOfflineAvailable,
                 onChanged: (bool value) {
                   setState(() {
@@ -234,11 +231,9 @@ class _AddTeamScreenState extends State<AddTeamScreen> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Save Team',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold))
-                        .tr(),
+                    : Text('save_team_button'.tr(),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

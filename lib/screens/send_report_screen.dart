@@ -28,10 +28,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   String? _selectedReportType;
   File? _imageFile;
-  // This now represents the location of the report, which can be changed.
   LatLng? _reportLocation;
   bool _isLoading = false;
-  String _statusMessage = "Detecting location...";
+  String _statusMessage = "detecting_location".tr();
 
   final AudioRecorder _audioRecorder = AudioRecorder();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -39,11 +38,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _isRecording = false;
 
   final List<String> _reportTypes = [
-    'Medical',
-    'Fire',
-    'Accident',
-    'Theft',
-    'Other'
+    'report_type_medical',
+    'report_type_fire',
+    'report_type_accident',
+    'report_type_theft',
+    'report_type_other'
   ];
 
   @override
@@ -69,7 +68,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (mounted) {
         setState(() {
           _reportLocation = LatLng(position.latitude, position.longitude);
-          _statusMessage = "Location Detected. Tap map to adjust.";
+          _statusMessage = "location_detected_adjust".tr();
         });
         final GoogleMapController controller = await _mapController.future;
         controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -77,7 +76,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         ));
       }
     } catch (e) {
-      if (mounted) setState(() => _statusMessage = 'Could not get location.');
+      if (mounted) setState(() => _statusMessage = "location_not_found".tr());
     }
   }
 
@@ -125,7 +124,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       } catch (e) {
         print("Error playing audio: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(tr('Could not play the audio file.'))),
+          SnackBar(content: Text("could_not_play_audio".tr())),
         );
       }
     }
@@ -163,7 +162,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_reportLocation == null) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(tr('Waiting for location...'))));
+          .showSnackBar(SnackBar(content: Text("waiting_for_location".tr())));
       return;
     }
 
@@ -182,15 +181,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (_imageFile != null) {
         imageUrl = await _uploadFile(_imageFile!, 'report_images');
         if (imageUrl == null) {
-          throw Exception(
-              "Image upload failed. Please check your connection or storage rules.");
+          throw Exception("image_upload_failed".tr());
         }
       }
       if (_audioPath != null) {
         audioUrl = await _uploadFile(File(_audioPath!), 'report_audio');
         if (audioUrl == null) {
-          throw Exception(
-              "Audio upload failed. Please check your connection or storage rules.");
+          throw Exception("audio_upload_failed".tr());
         }
       }
 
@@ -217,15 +214,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(tr('Report sent successfully!')),
+          content: Text("report_sent_successfully".tr()),
           backgroundColor: Colors.green,
         ),
       );
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(tr(
-              'Failed to send report: ${e.toString().replaceFirst("Exception: ", "")}'))));
+          content: Text(
+              "${"failed_to_send_report".tr()}: ${e.toString().replaceFirst("Exception: ", "")}")));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -245,10 +242,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           ),
         ],
       ),
-      // MODIFIED: Using a Stack to place the form over the map
       body: Stack(
         children: [
-          // The map now fills the entire background
           if (_reportLocation != null)
             GoogleMap(
               onMapCreated: (controller) {
@@ -260,11 +255,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 target: _reportLocation!,
                 zoom: 15.0,
               ),
-              // MODIFIED: The map is now interactive
               onTap: (tappedPosition) {
                 setState(() {
                   _reportLocation = tappedPosition;
-                  _statusMessage = "Location manually adjusted.";
+                  _statusMessage = "location_manually_adjusted".tr();
                 });
               },
               markers: {
@@ -278,10 +272,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
             )
           else
             const Center(child: CircularProgressIndicator()),
-
-          // The form is now in a DraggableScrollableSheet
           DraggableScrollableSheet(
-            initialChildSize: 0.4, // Start at 40% of the screen height
+            initialChildSize: 0.4,
             minChildSize: 0.1,
             maxChildSize: 0.8,
             builder: (BuildContext context, ScrollController scrollController) {
@@ -319,26 +311,25 @@ class _SendReportScreenState extends State<SendReportScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('report_type_label',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold))
-                              .tr(),
+                          Text("report_type_label".tr(),
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             value: _selectedReportType,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12))),
-                            hint: const Text('select_report_type_hint').tr(),
+                            hint: Text("select_report_type_hint".tr()),
                             items: _reportTypes
-                                .map((type) => DropdownMenuItem(
-                                    value: type, child: Text(type).tr()))
+                                .map((typeKey) => DropdownMenuItem(
+                                    value: typeKey, child: Text(typeKey.tr())))
                                 .toList(),
                             onChanged: (value) =>
                                 setState(() => _selectedReportType = value),
-                            validator: (value) =>
-                                value == null ? 'Please select a type' : null,
+                            validator: (value) => value == null
+                                ? "validator_select_type".tr()
+                                : null,
                           ),
                           const SizedBox(height: 24),
                           TextFormField(
@@ -358,11 +349,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
                           const SizedBox(height: 8),
                           _buildVoiceRecorderUI(),
                           const SizedBox(height: 24),
-                          const Text('Add Image',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold))
-                              .tr(),
+                          Text("add_image_label".tr(),
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           GestureDetector(
                             onTap: _pickImage,
@@ -384,9 +373,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(_statusMessage,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold))
-                              .tr(),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 32),
                           SizedBox(
                             width: double.infinity,
@@ -402,12 +390,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
                               child: _isLoading
                                   ? const CircularProgressIndicator(
                                       color: Colors.white)
-                                  : const Text('Send Report',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18))
-                                      .tr(),
+                                  : Text("send_report_button".tr(),
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18)),
                             ),
                           ),
                         ],
@@ -429,7 +416,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         color: Colors.red.shade100,
         child: ListTile(
           leading: const Icon(Icons.mic, color: Colors.red),
-          title: const Text('Recording...'),
+          title: Text("recording_status".tr()),
           trailing: IconButton(
             icon: const Icon(Icons.stop, color: Colors.red),
             onPressed: _stopRecording,
@@ -443,7 +430,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         color: Colors.blue.shade50,
         child: ListTile(
           leading: const Icon(Icons.audiotrack, color: Colors.blue),
-          title: const Text('Voice Note Ready').tr(),
+          title: Text("voice_note_ready".tr()),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -463,9 +450,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     return ElevatedButton.icon(
       icon: const Icon(Icons.mic_none, color: Colors.white),
-      label:
-          const Text('Record Voice Note', style: TextStyle(color: Colors.white))
-              .tr(),
+      label: Text("record_voice_note".tr(),
+          style: const TextStyle(color: Colors.white)),
       onPressed: _startRecording,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF0A2342),

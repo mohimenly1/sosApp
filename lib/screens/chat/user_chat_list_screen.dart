@@ -14,11 +14,9 @@ class UserChatListScreen extends StatefulWidget {
 class _UserChatListScreenState extends State<UserChatListScreen> {
   final String? _currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-  // Fetches the rescue teams that have shared a safe route with the current user
   Future<List<DocumentSnapshot>> _getAccessibleRescueTeams() async {
     if (_currentUserId == null) return [];
 
-    // 1. Find all routes shared with the user
     final accessSnapshot = await FirebaseFirestore.instance
         .collection('user_safe_route_access')
         .where('userId', isEqualTo: _currentUserId)
@@ -28,12 +26,11 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
     final grantedByRescueUserIds = accessSnapshot.docs
         .map((doc) => doc.data()['accessGrantedBy'] as String)
-        .toSet() // Use a Set to avoid duplicates
+        .toSet()
         .toList();
 
     if (grantedByRescueUserIds.isEmpty) return [];
 
-    // 2. Find all rescue team users from the IDs collected
     final rescueTeamsSnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('uid', whereIn: grantedByRescueUserIds)
@@ -45,7 +42,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(tr('Contact Rescue Teams'))),
+      appBar: AppBar(title: Text('contact_rescue_teams_title'.tr())),
       body: FutureBuilder<List<DocumentSnapshot>>(
         future: _getAccessibleRescueTeams(),
         builder: (context, snapshot) {
@@ -53,12 +50,13 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text(tr('Error: ${snapshot.error}')));
+            return Center(
+                child: Text('${'error_prefix'.tr()} ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
-                tr('No rescue teams have shared a route with you yet.'),
+                'no_teams_shared_route'.tr(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
@@ -79,15 +77,15 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                     backgroundColor: Color(0xFF0A2442),
                     child: Icon(Icons.security_outlined, color: Colors.white),
                   ),
-                  title: Text(tr(teamUser['name'] ?? 'Rescue Team')),
-                  subtitle: Text(tr('Tap to start a conversation')),
+                  title: Text(teamUser['name'] ?? 'rescue_team'.tr()),
+                  subtitle: Text('tap_to_start_conversation'.tr()),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => P2PChatScreen(
                           recipientId: teamUser['uid'],
-                          recipientName: teamUser['name'] ?? 'Rescue Team',
+                          recipientName: teamUser['name'] ?? 'rescue_team'.tr(),
                         ),
                       ),
                     );
